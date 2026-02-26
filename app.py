@@ -6,9 +6,19 @@ The app is very simple to use and targeted towards mobile users (as elderly tend
 By Miguel Monreal on 27/02/2026"""
 
 from flask import Flask
+from config 
+import os
 
 # Initialises app
 app = Flask(__name__)
+
+# Initialize the DB
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "recipes.db")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db.init_app(app)
+
+app.config["SECRET_KEY"] = "secret_shhhh"
 
 
 @app.route("/")
