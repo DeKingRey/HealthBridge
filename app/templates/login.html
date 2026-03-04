@@ -5,11 +5,11 @@
     <form method="POST">
         {{ form.hidden_tag() }}
 
-        {{ form.username }}
+        {{ form.email }}
         {{ form.password }}
 
         {{ form.submit }}
     </form>
 
-    <p>Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a></p>
+    <p>Don't have an account? <a href="{{ url_for('main.register') }}">Sign Up</a></p>
 {% endblock %}
