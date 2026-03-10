@@ -7,6 +7,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False, unique=False)
     email = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
+    is_verified = db.Column(db.Boolean, default=False)
 
     user_links = db.relationship("UserHealth", back_populates="user")
 
