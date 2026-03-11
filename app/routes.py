@@ -15,14 +15,14 @@ from flask import (render_template, Blueprint, url_for,
                    redirect, request)
 from flask_login import (login_required, login_user, logout_user)
 from app.models import (User)
-from app.forms import RegisterForm, LoginForm
+from app.forms import RegisterForm, LoginForm, ResetPassword
 from app import db, bcrypt, login_manager, mail
-from itsdangerous import URLSafeSerializer
+from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 import os
 
 main = Blueprint("main", __name__)
-serializer = URLSafeSerializer(os.getenv("SECRET_KEY"))
+serializer = URLSafeTimedSerializer(os.getenv("SECRET_KEY"))
 
 
 def generate_verification_token(email):
@@ -32,6 +32,11 @@ def generate_verification_token(email):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@main.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
 
 
 @main.route("/")
@@ -58,7 +63,8 @@ def login():
                     login_user(user)
                     return redirect(url_for("main.dashboard"))
                 else:
-                    send_verification_email(user.email)
+                    subject, body = register_email_info(user.email)
+                    send_verification_email(user.email, subject, body)
                     return render_template("verify_email.html",
                                            header="Please verify your email")
     return render_template("login.html", header="Login",
@@ -86,17 +92,41 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        # login_user(new_user)
-
-        send_verification_email(form.email.data)
+        # Sends verification email
+        subject, body = register_email_info(form.email.data)
+        send_verification_email(form.email.data, subject, body)
         return render_template("verify_email.html",
                                header="Please verify your email")
     return render_template("register.html", header="Register",
                            form=form)
 
 
+@main.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+    if request.method == "POST":
+        form = request.form
+
+        token = generate_verification_token(form.email.data)
+        verify_url = url_for("main.verify_email",
+                             token=token,
+                             forgot_password=True,
+                             register=False,
+                             _external=True)
+
+        subject = "Click here to reset your password"
+        body = f"""
+        Welcome!
+
+        Click the link below to verify your account:
+
+        {verify_url}
+        """
+
+        send_verification_email(form.email.data, subject, body)
+
+
 @main.route("/verify/<token>")
-def verify_email(token):
+def verify_email(token, register, forgot_password):
     try:
         email = serializer.loads(token, salt="email-confirm", max_age=3600)
     except ValueError:
@@ -105,30 +135,41 @@ def verify_email(token):
     user = User.query.filter_by(email=email).first()
 
     if user:
-        user.is_verified = True
-        db.session.commit()
-        login_user(user)
-    return redirect(url_for("main.dashboard"))
+        if register:
+            user.is_verified = True
+            db.session.commit()
+            login_user(user)
+            return redirect(url_for("main.dashboard"))
+        elif forgot_password:
+            return redirect(url_for("main.dashboard"))
+    return redirect(url_for("main.login"))
 
 
-def send_verification_email(email):
+def send_verification_email(email, subject, body):
     # Send a verification email to the user
-    token = generate_verification_token(email)
-    verify_url = url_for("main.verify_email",
-                         token=token,
-                         _external=True)
-
-    subject = "Please verify your email"
+    subject = subject
     msg = Message(subject=subject,
-                  sender=os.getenv("MAIL_USERNAME"),
                   recipients=[email]
                   )
 
-    msg.body = f"""
+    msg.body = body
+    mail.send(msg)
+
+
+def register_email_info(email):
+    token = generate_verification_token(email)
+    verify_url = url_for("main.verify_email",
+                         token=token,
+                         forgot_password=False,
+                         register=True,
+                         _external=True)
+
+    subject = "Please verify your email"
+    body = f"""
     Welcome!
 
     Click the link below to verify your account:
 
     {verify_url}
     """
-    mail.send(msg)
+    return subject, body

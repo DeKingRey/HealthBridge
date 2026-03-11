@@ -58,3 +58,25 @@ class LoginForm(FlaskForm):
     )
 
     submit = SubmitField("Login")
+
+
+class ResetPassword(FlaskForm):
+    email = StringField("Email", validators=[
+        InputRequired(),
+        Email()
+    ])
+
+    password = PasswordField("Password", validators=[
+        InputRequired(),
+        Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH),
+        EqualTo("confirm_password", "Passwords do not match!")],
+        render_kw={"placeholder": "Password"}
+    )
+
+    confirm_password = PasswordField("Confirm_Password", validators=[
+        InputRequired(),
+        Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH)],
+        render_kw={"placeholder": "Confirm Password"}
+    )
+
+    submit = SubmitField("Reset Password")
