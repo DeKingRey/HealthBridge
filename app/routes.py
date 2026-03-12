@@ -15,7 +15,7 @@ from flask import (render_template, Blueprint, url_for,
                    redirect, request)
 from flask_login import (login_required, login_user, logout_user)
 from app.models import (User)
-from app.forms import RegisterForm, LoginForm, ResetPassword
+from app.forms import RegisterForm, LoginForm, ResetPasswordForm
 from app import db, bcrypt, login_manager, mail
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
@@ -103,35 +103,52 @@ def register():
 
 @main.route("/reset-password", methods=["GET", "POST"])
 def reset_password():
-    if request.method == "POST":
-        form = request.form
+    form = ResetPasswordForm()
+    email_verified = request.args.get("email_verified", "False") == "True"
+    email = request.args.get("email")
 
-        token = generate_verification_token(form.email.data)
-        verify_url = url_for("main.verify_email",
-                             token=token,
-                             forgot_password=True,
-                             register=False,
-                             _external=True)
+    # Send email to user to verify email then allows for password reset
+    if form.validate_on_submit():
+        if not email_verified:
+            token = generate_verification_token(form.email.data)
+            verify_url = url_for("main.verify_email",
+                                 token=token,
+                                 forgot_password=True,
+                                 register=False,
+                                 _external=True)
 
-        subject = "Click here to reset your password"
-        body = f"""
-        Welcome!
+            subject = "Reset Password Request"
+            body = f"""
+            Click on the link to reset your password:
 
-        Click the link below to verify your account:
+            {verify_url}
+            """
+            send_verification_email(form.email.data, subject, body)
+        elif email_verified:
+            # Generates a secure password
+            hashed_password = bcrypt.generate_password_hash(form.password.data)
 
-        {verify_url}
-        """
-
-        send_verification_email(form.email.data, subject, body)
+            user = User.query.filter_by(email=email).first()
+            # Updates password
+            if user:
+                user.password = hashed_password
+                db.session.commit()
+                login_user(user)
+                return redirect(url_for("main.dashboard"))
+            return redirect(url_for("main.login"))
+    return render_template("reset-password.html", header="Reset Password",
+                           form=form, email_verified=email_verified)
 
 
 @main.route("/verify/<token>")
-def verify_email(token, register, forgot_password):
+def verify_email(token):
     try:
         email = serializer.loads(token, salt="email-confirm", max_age=3600)
     except ValueError:
         return "Verification link expired or invalid"
 
+    forgot_password = request.args.get("forgot_password", "False") == "True"
+    register = request.args.get("register", "False") == "True"
     user = User.query.filter_by(email=email).first()
 
     if user:
@@ -141,7 +158,9 @@ def verify_email(token, register, forgot_password):
             login_user(user)
             return redirect(url_for("main.dashboard"))
         elif forgot_password:
-            return redirect(url_for("main.dashboard"))
+            return redirect(url_for("main.reset_password",
+                                    email_verified=True,
+                                    email=email))
     return redirect(url_for("main.login"))
 
 

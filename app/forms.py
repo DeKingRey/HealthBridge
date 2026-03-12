@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, SubmitField)
 from wtforms.validators import (InputRequired, Length, ValidationError,
-                                EqualTo, Email, DataRequired)
+                                EqualTo, Email, DataRequired, Optional)
 from config import (MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH,
                     MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH)
 from . models import User
@@ -60,23 +60,32 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Login")
 
 
-class ResetPassword(FlaskForm):
+class ResetPasswordForm(FlaskForm):
     email = StringField("Email", validators=[
-        InputRequired(),
-        Email()
+        Email(),
+        Optional()
     ])
 
     password = PasswordField("Password", validators=[
-        InputRequired(),
         Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH),
-        EqualTo("confirm_password", "Passwords do not match!")],
+        EqualTo("confirm_password", "Passwords do not match!"),
+        Optional()],
         render_kw={"placeholder": "Password"}
     )
 
     confirm_password = PasswordField("Confirm_Password", validators=[
-        InputRequired(),
-        Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH)],
+        Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH),
+        Optional()],
         render_kw={"placeholder": "Confirm Password"}
     )
 
     submit = SubmitField("Reset Password")
+
+    # Ensures email exists
+    def validate_email(self, email):
+        existing_user_email = User.query.filter_by(
+            email=email.data).first()
+        if not existing_user_email:
+            raise ValidationError(
+                "There is no account for this email"
+            )
