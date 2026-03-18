@@ -15,8 +15,8 @@ class RegisterForm(FlaskForm):
     )
 
     email = StringField("Email", validators=[
-        DataRequired(),
-        Email()],
+        DataRequired("Please enter an email"),
+        Email(check_deliverability=True)],
         render_kw={"placeholder": "Email"}
     )
 
@@ -47,9 +47,9 @@ class RegisterForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[
-        InputRequired(),
-        Email()
-    ])
+        InputRequired("Please eneter an email"),
+        Email(check_deliverability=True)],
+        render_kw={"placeholder": "Email"})
 
     password = PasswordField("Password", validators=[
         InputRequired(),
@@ -62,9 +62,9 @@ class LoginForm(FlaskForm):
 
 class ResetPasswordForm(FlaskForm):
     email = StringField("Email", validators=[
-        Email(),
-        Optional()
-    ])
+        Email(check_deliverability=True),
+        Optional()],
+        render_kw={"placeholder": "Email"})
 
     password = PasswordField("Password", validators=[
         Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH),

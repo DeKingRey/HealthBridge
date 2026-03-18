@@ -7,6 +7,22 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">HealthBridge</div>
+        <ul>
+            <li><a href="/">Home</a></li>
+
+            <!-- Shows register/login if not logged in, dashboard otherwise -->
+            {% if not current_user.is_authenticated %}
+                <li><a href="/register">Register</a></li>
+                <li><a href="/login">Login</a></li>
+            {% else %}
+                <li><a href="/dashboard">Dashboard</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
     <header>{{ header }}</header>
 
     <main>{% block content %}{% endblock %}</main>

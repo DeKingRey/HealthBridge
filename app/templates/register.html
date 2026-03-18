@@ -5,10 +5,41 @@
     <form method="POST">
         {{ form.hidden_tag() }}
         
-        {{ form.username }}
-        {{ form.email }}
-        {{ form.password }}
-        {{ form.confirm_password }}
+        <!-- Email Div -->
+        <div>
+            {{ form.email.label }}
+            {{ form.email }}
+
+            {% for error in form.email.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <!-- Username Div -->
+        <div>
+            {{ form.username.label }}
+            {{ form.username }}
+            
+            {% for error in form.username.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <!-- Password Div -->
+        <div>
+            {{ form.password.label }}
+            {{ form.password }}
+            
+            {{ form.confirm_password.label }}
+            {{ form.confirm_password }}
+
+            {% for error in form.password.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+        
+        <label for="remember">Remember Me</label>
+        <input name="remember" type="checkbox" value="True">
 
         {{ form.submit }}
     </form>

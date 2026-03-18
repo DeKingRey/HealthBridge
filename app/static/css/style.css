@@ -1,0 +1,93 @@
+/* Primary Colour Scheme */
+:root {
+    --primary-colour: #2f855aff;
+    --secondary-colour: #a7c4a0ff;
+    --accent-colour: #f6ad55ff;
+    --background-colour: #fffdf7ff;
+    --text-colour: #2d3748ff;
+    --error-colour: #DC2626;
+}
+
+@font-face {
+    font-family: "roboto";
+    src: url("roboto.ttf");
+}
+
+* {
+    font-family: "roboto";
+    color: var(--text-colour);
+}
+
+/* #region Base */
+/* Styling for most of the site - the base of each element */
+
+body {
+    margin: 0;
+    font-size: 1rem;
+    padding: 0;
+    background-color: var(--background-colour);
+    color: var(--text-colour);
+}
+
+main {
+    padding: 1.05rem;
+    line-height: 1.6;
+}
+
+.btn {
+    padding: 0.5rem 1.5rem;
+}
+
+/* #endregion */
+
+/* #region Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    width: 100%;
+    margin-bottom: 2rem;
+
+    background-color: var(--primary-colour);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--accent-colour);
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: var(--background-colour);
+    letter-spacing: 1px;
+}
+
+.navbar ul {
+    list-style-type: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    gap: 2rem
+}
+
+.navbar a {
+    color: var(--background-colour);
+    text-decoration: none;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 500;
+    transition: 0.3s;
+
+    display: flex;
+    padding: 1.5rem;
+}
+
+.navbar a:hover {
+    background-color: var(--accent-colour);
+    cursor: pointer;
+}
+
+.btns {
+    display: flex;
+}
+
+/* #endregion */

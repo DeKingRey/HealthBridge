@@ -13,7 +13,8 @@ Date: 27-02-2026
 
 from flask import (render_template, Blueprint, url_for,
                    redirect, request)
-from flask_login import (login_required, login_user, logout_user)
+from flask_login import (login_required, login_user, logout_user,
+                         current_user)
 from app.models import (User)
 from app.forms import RegisterForm, LoginForm, ResetPasswordForm
 from app import db, bcrypt, login_manager, mail
@@ -52,18 +53,23 @@ def dashboard():
 
 @main.route("/login", methods=["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.dashboard"))
+
     form = LoginForm()
 
-    # Logs in user if validated, user is valid, and password matches user
+    # Logs in user if verified, user is valid, and password matches user
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
+                remember_flag = request.form.get("remember") == "True"
                 if user.is_verified:
-                    login_user(user)
+                    login_user(user, remember=remember_flag)
                     return redirect(url_for("main.dashboard"))
                 else:
-                    subject, body = register_email_info(user.email)
+                    subject, body = register_email_info(user.email,
+                                                        remember_flag)
                     send_verification_email(user.email, subject, body)
                     return render_template("verify_email.html",
                                            header="Please verify your email")
@@ -80,6 +86,9 @@ def logout():
 
 @main.route("/register", methods=["GET", "POST"])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.dashboard"))
+
     form = RegisterForm()
 
     # Adds user to database if validated successfully
@@ -92,8 +101,10 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        remember_flag = request.form.get("remember") == "True"
+
         # Sends verification email
-        subject, body = register_email_info(form.email.data)
+        subject, body = register_email_info(form.email.data, remember_flag)
         send_verification_email(form.email.data, subject, body)
         return render_template("verify_email.html",
                                header="Please verify your email")
@@ -133,7 +144,8 @@ def reset_password():
             if user:
                 user.password = hashed_password
                 db.session.commit()
-                login_user(user)
+                remember_flag = request.form.get("remember") == "True"
+                login_user(user, remember=remember_flag)
                 return redirect(url_for("main.dashboard"))
             return redirect(url_for("main.login"))
     return render_template("reset-password.html", header="Reset Password",
@@ -155,7 +167,9 @@ def verify_email(token):
         if register:
             user.is_verified = True
             db.session.commit()
-            login_user(user)
+
+            remember_flag = request.args.get("remember", "False") == "True"
+            login_user(user, remember=remember_flag)
             return redirect(url_for("main.dashboard"))
         elif forgot_password:
             return redirect(url_for("main.reset_password",
@@ -175,13 +189,14 @@ def send_verification_email(email, subject, body):
     mail.send(msg)
 
 
-def register_email_info(email):
+def register_email_info(email, remember_flag):
     token = generate_verification_token(email)
     verify_url = url_for("main.verify_email",
                          token=token,
                          forgot_password=False,
                          register=True,
-                         _external=True)
+                         _external=True,
+                         remember=remember_flag)
 
     subject = "Please verify your email"
     body = f"""
