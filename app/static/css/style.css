@@ -34,8 +34,14 @@ main {
     line-height: 1.6;
 }
 
-.btn {
-    padding: 0.5rem 1.5rem;
+.btns {
+    display: flex;
+    gap: 1rem;
+    margin-right: 1rem;
+}
+
+.btn:hover {
+    background-color: rgb(243, 149, 35);
 }
 
 /* #endregion */
@@ -43,7 +49,6 @@ main {
 /* #region Navbar */
 .navbar {
     display: flex;
-    justify-content: space-around;
     align-items: center;
 
     width: 100%;
@@ -51,7 +56,6 @@ main {
 
     background-color: var(--primary-colour);
     backdrop-filter: blur(15px);
-    border-bottom: 1px solid var(--accent-colour);
 }
 
 .logo {
@@ -59,26 +63,34 @@ main {
     font-weight: 500;
     color: var(--background-colour);
     letter-spacing: 1px;
+
+    margin-left: 1rem;
+    display: flex;
+    flex: 1;
+    justify-content: flex-start;
 }
 
 .navbar ul {
     list-style-type: none;
-    display: flex;
     padding: 0;
     margin: 0;
-    gap: 2rem
+
+    display: flex;
+    flex: 1;
+    gap: 2rem;
+    justify-content: center;
 }
 
 .navbar a {
     color: var(--background-colour);
     text-decoration: none;
     text-align: center;
-    font-size: 1.05rem;
+    font-size: 1.5rem;
     font-weight: 500;
     transition: 0.3s;
 
     display: flex;
-    padding: 1.5rem;
+    padding: 1.2rem;
 }
 
 .navbar a:hover {
@@ -86,8 +98,22 @@ main {
     cursor: pointer;
 }
 
-.btns {
-    display: flex;
+.navbar .btns {
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.navbar .btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 1.35rem;
+
+    background-color: var(--accent-colour);
+    color: var(--background-colour);
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease-in;
 }
 
 /* #endregion */

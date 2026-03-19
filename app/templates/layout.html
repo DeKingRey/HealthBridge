@@ -14,13 +14,16 @@
             <li><a href="/">Home</a></li>
 
             <!-- Shows register/login if not logged in, dashboard otherwise -->
-            {% if not current_user.is_authenticated %}
-                <li><a href="/register">Register</a></li>
-                <li><a href="/login">Login</a></li>
-            {% else %}
+            {% if current_user.is_authenticated %}
                 <li><a href="/dashboard">Dashboard</a></li>
             {% endif %}
         </ul>
+        <div class="btns">
+            {% if not current_user.is_authenticated %}
+                <a href="/login" class="btn">Login</a>
+                <a href="/register" class="btn">Register</a>
+            {% endif %}
+        </div>
     </nav>
 
     <header>{{ header }}</header>
