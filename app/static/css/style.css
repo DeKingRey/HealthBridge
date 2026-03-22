@@ -21,27 +21,85 @@
 /* #region Base */
 /* Styling for most of the site - the base of each element */
 
-body {
+html, body {
+    height: 100%;
     margin: 0;
+}
+
+body {
     font-size: 1rem;
     padding: 0;
     background-color: var(--background-colour);
     color: var(--text-colour);
+
+    display: flex;
+    flex-direction: column;
 }
 
 main {
-    padding: 1.05rem;
+    flex: 1;
+
+    padding: 1rem;
     line-height: 1.6;
+    font-size: 1.2rem;
 }
+
+h1, header {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 1.2rem;
+}
+
+footer {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    padding: 1.2rem;
+    margin-top: 2rem;
+
+    background-color: var(--text-colour);
+    backdrop-filter: blur(15px);
+    color: var(--background-colour);
+    text-align: center;
+    font-weight: 600;
+
+    box-sizing: border-box;
+}
+
+/* #endregion */
+
+/* #region Buttons */
 
 .btns {
     display: flex;
     gap: 1rem;
     margin-right: 1rem;
+
+    flex: 1;
+}
+
+.btn {
+    display: flex;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    cursor: pointer;
+
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 1.35rem;
+
+    background-color: var(--accent-colour);
+    color: var(--background-colour);
+
+    text-decoration: none;
+    text-align: center;
+    transition: 0.3s ease-in;
 }
 
 .btn:hover {
     background-color: rgb(243, 149, 35);
+    transform: scale(1.15);
 }
 
 /* #endregion */
@@ -56,6 +114,9 @@ main {
 
     background-color: var(--primary-colour);
     backdrop-filter: blur(15px);
+
+    position: sticky;
+    top: 0;
 }
 
 .logo {
@@ -81,7 +142,7 @@ main {
     justify-content: center;
 }
 
-.navbar a {
+.navlink a {
     color: var(--background-colour);
     text-decoration: none;
     text-align: center;
@@ -93,27 +154,12 @@ main {
     padding: 1.2rem;
 }
 
-.navbar a:hover {
+.navlink a:hover {
     background-color: var(--accent-colour);
     cursor: pointer;
 }
 
 .navbar .btns {
-    flex: 1;
     justify-content: flex-end;
 }
-
-.navbar .btn {
-    padding: 0.5rem 1.5rem;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 1.35rem;
-
-    background-color: var(--accent-colour);
-    color: var(--background-colour);
-    border: none;
-    cursor: pointer;
-    transition: 0.3s ease-in;
-}
-
 /* #endregion */

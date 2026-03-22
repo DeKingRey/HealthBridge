@@ -11,13 +11,16 @@
     <nav class="navbar">
         <div class="logo">HealthBridge</div>
         <ul>
-            <li><a href="/">Home</a></li>
+            <li class="navlink"><a href="/">Home</a></li>
 
             <!-- Shows register/login if not logged in, dashboard otherwise -->
             {% if current_user.is_authenticated %}
-                <li><a href="/dashboard">Dashboard</a></li>
+                <li class="navlink"><a href="/dashboard">Dashboard</a></li>
+                <li class="navlink"><a href="/health-info">Health Info</a></li>
             {% endif %}
         </ul>
+
+        <!-- Navbar Buttons -->
         <div class="btns">
             {% if not current_user.is_authenticated %}
                 <a href="/login" class="btn">Login</a>

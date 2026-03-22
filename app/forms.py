@@ -89,3 +89,34 @@ class ResetPasswordForm(FlaskForm):
             raise ValidationError(
                 "There is no account for this email"
             )
+
+
+class AddHealthInfoForm(FlaskForm):
+    email = StringField("Email", validators=[
+        Email(check_deliverability=True),
+        Optional()],
+        render_kw={"placeholder": "Email"})
+
+    password = PasswordField("Password", validators=[
+        Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH),
+        EqualTo("confirm_password", "Passwords do not match!"),
+        Optional()],
+        render_kw={"placeholder": "Password"}
+    )
+
+    confirm_password = PasswordField("Confirm_Password", validators=[
+        Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH),
+        Optional()],
+        render_kw={"placeholder": "Confirm Password"}
+    )
+
+    submit = SubmitField("Reset Password")
+
+    # Ensures email exists
+    def validate_email(self, email):
+        existing_user_email = User.query.filter_by(
+            email=email.data).first()
+        if not existing_user_email:
+            raise ValidationError(
+                "There is no account for this email"
+            )

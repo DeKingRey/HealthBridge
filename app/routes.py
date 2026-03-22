@@ -35,11 +35,6 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-@main.errorhandler(404)
-def page_not_found(e):
-    return render_template("404.html"), 404
-
-
 @main.route("/")
 def home():
     return render_template("home.html", header="Home")
@@ -49,6 +44,12 @@ def home():
 @login_required
 def dashboard():
     return render_template("dashboard.html", header="Dashboard")
+
+
+@main.route("/health-info", methods=["GET", "POST"])
+@login_required
+def health_info():
+    return render_template("health-info.html", header="Health Info")
 
 
 @main.route("/login", methods=["GET", "POST"])
@@ -71,7 +72,7 @@ def login():
                     subject, body = register_email_info(user.email,
                                                         remember_flag)
                     send_verification_email(user.email, subject, body)
-                    return render_template("verify_email.html",
+                    return render_template("verify-email.html",
                                            header="Please verify your email")
     return render_template("login.html", header="Login",
                            form=form)
@@ -106,7 +107,7 @@ def register():
         # Sends verification email
         subject, body = register_email_info(form.email.data, remember_flag)
         send_verification_email(form.email.data, subject, body)
-        return render_template("verify_email.html",
+        return render_template("verify-email.html",
                                header="Please verify your email")
     return render_template("register.html", header="Register",
                            form=form)
