@@ -5,28 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Bridge</title>
     <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="logo">HealthBridge</div>
-        <ul>
-            <li class="navlink"><a href="/">Home</a></li>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
 
-            <!-- Shows register/login if not logged in, dashboard otherwise -->
-            {% if current_user.is_authenticated %}
-                <li class="navlink"><a href="/dashboard">Dashboard</a></li>
-                <li class="navlink"><a href="/health-info">Health Info</a></li>
-            {% endif %}
-        </ul>
+</head>
+<body class="theme">
+    <!-- Navbar -->
+    <nav class="w3-bar primary-colour w3-xxlarge">
+        <div class="w3-bar-item w3-left white-text-colour w3-mobile">HealthBridge</div>
+        <a href="/" class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/' %}accent-colour{% endif %}">
+            Home
+        </a>
+
+        <!-- Shows register/login if not logged in, dashboard otherwise -->
+        {% if current_user.is_authenticated %}
+            <a href="/dashboard" class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/dashboard' %}accent-colour{% endif %}">
+                Dashboard
+            </a>
+            <a href="/health-info" class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/health-info' %}accent-colour{% endif %}">
+                Health Info
+            </a>
+        {% endif %}
 
         <!-- Navbar Buttons -->
-        <div class="btns">
-            {% if not current_user.is_authenticated %}
-                <a href="/login" class="btn">Login</a>
-                <a href="/register" class="btn">Register</a>
-            {% endif %}
-        </div>
+        {% if not current_user.is_authenticated %}
+            <div class="w3-right nav-btns">
+                <a href="/login" class="w3-btn w3-bar-item w3-round-xlarge btn-hover-colour accent-colour w3-mobile">
+                    Login
+                </a>
+                <a href="/register" class="w3-btn w3-bar-item w3-round-xlarge btn-hover-colour accent-colour w3-mobile">
+                    Register
+                </a>
+            </div>
+        {% endif %}
     </nav>
 
     <header>{{ header }}</header>
