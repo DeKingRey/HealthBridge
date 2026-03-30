@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block content %}
+
+        <!-- Search bar to find recipes -->
+        <li>
+            <form action=""></form>
+            <div class="form-group">
+                <div class="search-wrapper">
+                    <input type="text" placeholder="Search..." name="search" id="search_input" autocomplete="off"  required>
+                    <ul class="suggestions" id="suggestions"></ul> 
+                </div>
+            </div>
+        </li>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <!-- Creates the input field and search bar for locations, first having a text input field, and then using suggestions as a list which will display search suggestions. -->
+        <div>
+            <div class="w3.container background-colour">
+                <label for="location">Search for pre-existing health info:</label>
+                <input type="text" placeholder="Search..." name="search" id="search_input" autocomplete="off">
+                <ul class="suggestions" id="locations"></ul> 
+            </div>
+        </div>
+        
+        <!-- Name Div -->
+        <div>
+            {{ form.name.label }}
+            {{ form.name }}
+
+            {% for error in form.name.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <!-- Description Div -->
+        <div>
+            {{ form.default_desc.label }}
+            {{ form.default_desc }}
+            
+            {% for error in form.default_desc.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <!-- Type ID Div -->
+        <div>
+            {{ form.type_id.label }}
+            {{ form.type_id() }}
+
+            {% for error in form.type_id.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+    
+        {{ form.submit }}
+    </form>
+
+    <a href="{{ url_for('main.health_info') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+        Return
+    </a>
+{% endblock %}

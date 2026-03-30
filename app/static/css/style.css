@@ -55,10 +55,23 @@ body {
 
 main {
     flex: 1;
+    margin: 1rem 1rem;
+}
+
+header {
+    font-size: 3rem;
+    font-weight: 600;
 }
 
 a {
     text-decoration: none;
+}
+
+nav {
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    left: 0;
 }
 
 .w3-bar {

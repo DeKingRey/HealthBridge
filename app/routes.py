@@ -15,7 +15,7 @@ from flask import (render_template, Blueprint, url_for,
                    redirect, request)
 from flask_login import (login_required, login_user, logout_user,
                          current_user)
-from app.models import (User, Health, UserHealth)
+from app.models import (User, Health, UserHealth, Type)
 from app.forms import (RegisterForm, LoginForm, ResetPasswordForm,
                        AddHealthInfoForm)
 from app import db, bcrypt, login_manager, mail
@@ -58,22 +58,40 @@ def health_info():
 def add_health_info():
     form = AddHealthInfoForm()
 
+    # Populates type choices
+    types = Type.query.all()
+    form.type_id.choices = [(0, "Select a type")] + [(t.id, t.name)
+                                                     for t in types]
+
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
         existing_info = request.form.get("existing_info") == "True"
+
+        # Adds input as new info if it doesn't exist
         if not existing_info:
-            new_health_info = Health(name=form.name.data,
-                                     default_desc=form.default_desc.data,
-                                     type_id=form.type_id.data)
+            health_info = Health(name=form.name.data,
+                                 default_description=form.default_desc.data,
+                                 type_id=form.type_id.data)
+            db.session.add(health_info)
+            db.session.commit()
+        else:
+            # First checks that existing id is in database
+            health_info_id = request.form.get("health_info_id")
+            health_records = Health.query.all()
+            health_info_ids = [h.id for h in health_records]
+
+            # If the id does not exist, it returns an error
+            if health_info_id not in health_info_ids:
+                return
+            health_info = Health.query.filter_by(id=health_info_id).first()
+        # Adds new health info
+        new_user_health_info = UserHealth(user_id=current_user.id,
+                                          health_id=health_info.id,
+                                          description=health_info.default_description)
+        db.session.add(new_user_health_info)
         db.session.commit()
 
-        remember_flag = request.form.get("remember") == "True"
-
-        # Sends verification email
-        subject, body = register_email_info(form.email.data, remember_flag)
-        send_verification_email(form.email.data, subject, body)
-        return render_template("verify-email.html",
-                               header="Please verify your email")
+        return redirect(url_for("main.health_info"))
     return render_template("add-health-info.html", header="Add Health Info",
                            form=form)
 

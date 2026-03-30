@@ -110,4 +110,4 @@ class AddHealthInfoForm(FlaskForm):
     type_id = SelectField("Type", choices=[], coerce=int,
                           validators=[DataRequired()])
 
-    submit = SubmitField("Reset Password")
+    submit = SubmitField("Add Info")
