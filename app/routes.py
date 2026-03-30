@@ -15,8 +15,9 @@ from flask import (render_template, Blueprint, url_for,
                    redirect, request)
 from flask_login import (login_required, login_user, logout_user,
                          current_user)
-from app.models import (User)
-from app.forms import RegisterForm, LoginForm, ResetPasswordForm
+from app.models import (User, Health, UserHealth)
+from app.forms import (RegisterForm, LoginForm, ResetPasswordForm,
+                       AddHealthInfoForm)
 from app import db, bcrypt, login_manager, mail
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
@@ -50,6 +51,31 @@ def dashboard():
 @login_required
 def health_info():
     return render_template("health-info.html", header="Health Info")
+
+
+@main.route("/add-health-info", methods=["GET", "POST"])
+@login_required
+def add_health_info():
+    form = AddHealthInfoForm()
+
+    # Adds info to database if validated succesfully
+    if form.validate_on_submit():
+        existing_info = request.form.get("existing_info") == "True"
+        if not existing_info:
+            new_health_info = Health(name=form.name.data,
+                                     default_desc=form.default_desc.data,
+                                     type_id=form.type_id.data)
+        db.session.commit()
+
+        remember_flag = request.form.get("remember") == "True"
+
+        # Sends verification email
+        subject, body = register_email_info(form.email.data, remember_flag)
+        send_verification_email(form.email.data, subject, body)
+        return render_template("verify-email.html",
+                               header="Please verify your email")
+    return render_template("add-health-info.html", header="Add Health Info",
+                           form=form)
 
 
 @main.route("/login", methods=["GET", "POST"])

@@ -32,6 +32,7 @@
 .text-colour {color:#2d3748ff !important}
 .white-text-colour {color:#fffdf7ff !important}
 .w3-border-theme {border-color:#ffc107 !important}
+.black-container {background-color: #2d3748ff; color: #fffdf7ff !important}
 
 .hover-colour:hover {color:#fffdf7ff !important; background-color:#f6ad55ff !important}
 .btn-hover-colour:hover {color:#fffdf7ff !important; background-color:#f39523 !important}
@@ -42,6 +43,20 @@
 
 
 /* W3 Overrides*/
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
 a {
     text-decoration: none;
 }
@@ -71,6 +86,17 @@ a {
 
 .w3-btn {
     transition: all 0.3s ease-in;
+}
+
+footer {
+    display: flex !important;
+    align-items: center;
+
+    margin-top: 2rem;
+    height: 4rem !important;
+    padding: 1.2rem;
+
+    font-weight: 600;
 }
 
 /* #region Base */

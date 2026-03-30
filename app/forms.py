@@ -1,9 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import (StringField, PasswordField, SubmitField)
+from wtforms import (StringField, PasswordField, SubmitField,
+                     TextAreaField, SelectField)
 from wtforms.validators import (InputRequired, Length, ValidationError,
                                 EqualTo, Email, DataRequired, Optional)
 from config import (MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH,
-                    MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH)
+                    MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH,
+                    MIN_HEALTH_LENGTH, MAX_HEALTH_LENGTH,
+                    MIN_DESC_LENGTH, MAX_DESC_LENGTH)
 from . models import User
 
 
@@ -27,7 +30,7 @@ class RegisterForm(FlaskForm):
         render_kw={"placeholder": "Password"}
     )
 
-    confirm_password = PasswordField("Confirm_Password", validators=[
+    confirm_password = PasswordField("Confirm Password", validators=[
         InputRequired(),
         Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH)],
         render_kw={"placeholder": "Confirm Password"}
@@ -73,7 +76,7 @@ class ResetPasswordForm(FlaskForm):
         render_kw={"placeholder": "Password"}
     )
 
-    confirm_password = PasswordField("Confirm_Password", validators=[
+    confirm_password = PasswordField("Confirm Password", validators=[
         Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH),
         Optional()],
         render_kw={"placeholder": "Confirm Password"}
@@ -92,31 +95,19 @@ class ResetPasswordForm(FlaskForm):
 
 
 class AddHealthInfoForm(FlaskForm):
-    email = StringField("Email", validators=[
-        Email(check_deliverability=True),
-        Optional()],
-        render_kw={"placeholder": "Email"})
-
-    password = PasswordField("Password", validators=[
-        Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH),
-        EqualTo("confirm_password", "Passwords do not match!"),
-        Optional()],
-        render_kw={"placeholder": "Password"}
+    name = StringField("Name", validators=[
+        InputRequired(),
+        Length(min=MIN_HEALTH_LENGTH, max=MAX_HEALTH_LENGTH)],
+        render_kw={"placeholder": "Name"}
     )
 
-    confirm_password = PasswordField("Confirm_Password", validators=[
-        Length(min=MIN_PASSWORD_LENGTH, max=MAX_PASSWORD_LENGTH),
-        Optional()],
-        render_kw={"placeholder": "Confirm Password"}
+    default_desc = TextAreaField("Default Description", validators=[
+        InputRequired(),
+        Length(min=MIN_DESC_LENGTH, max=MAX_DESC_LENGTH)],
+        render_kw={"placeholder": "Default Description"}
     )
+
+    type_id = SelectField("Type", choices=[], coerce=int,
+                          validators=[DataRequired()])
 
     submit = SubmitField("Reset Password")
-
-    # Ensures email exists
-    def validate_email(self, email):
-        existing_user_email = User.query.filter_by(
-            email=email.data).first()
-        if not existing_user_email:
-            raise ValidationError(
-                "There is no account for this email"
-            )
