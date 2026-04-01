@@ -58,6 +58,12 @@ def health_info():
 def add_health_info():
     form = AddHealthInfoForm()
 
+    health_records = Health.query.all()
+    search_content = [
+        {"id": h.id, "name": h.name}
+        for h in health_records
+    ]
+
     # Populates type choices
     types = Type.query.all()
     form.type_id.choices = [(0, "Select a type")] + [(t.id, t.name)
@@ -77,7 +83,12 @@ def add_health_info():
         else:
             # First checks that existing id is in database
             health_info_id = request.form.get("health_info_id")
-            health_records = Health.query.all()
+
+            try:
+                health_info_id = int(health_info_id)
+            except (TypeError, ValueError):
+                return "Invalid ID", 400
+
             health_info_ids = [h.id for h in health_records]
 
             # If the id does not exist, it returns an error
@@ -93,7 +104,7 @@ def add_health_info():
 
         return redirect(url_for("main.health_info"))
     return render_template("add-health-info.html", header="Add Health Info",
-                           form=form)
+                           form=form, search_content=search_content)
 
 
 @main.route("/login", methods=["GET", "POST"])

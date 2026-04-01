@@ -1,26 +1,20 @@
 {% extends "layout.html" %}
 {% block content %}
 
-        <!-- Search bar to find recipes -->
-        <li>
-            <form action=""></form>
-            <div class="form-group">
-                <div class="search-wrapper">
-                    <input type="text" placeholder="Search..." name="search" id="search_input" autocomplete="off"  required>
-                    <ul class="suggestions" id="suggestions"></ul> 
-                </div>
-            </div>
-        </li>
-
     <form method="POST">
         {{ form.hidden_tag() }}
+
+        <!-- Hidden inputs if the user uses pre existing info -->
+        <input type="hidden" id="health_info_id">
+        <input type="hidden" id="existing_info">
         
-        <!-- Creates the input field and search bar for locations, first having a text input field, and then using suggestions as a list which will display search suggestions. -->
+        <!-- Search input for pre existing health records -->
         <div>
             <div class="w3.container background-colour">
-                <label for="location">Search for pre-existing health info:</label>
+                <label for="search">Search for pre-existing health info:</label>
                 <input type="text" placeholder="Search..." name="search" id="search_input" autocomplete="off">
-                <ul class="suggestions" id="locations"></ul> 
+
+                <div class="w3-bar-block theme" id="suggestions" style="width: 5rem;"></div>
             </div>
         </div>
         
@@ -60,4 +54,11 @@
     <a href="{{ url_for('main.health_info') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
         Return
     </a>
+
+    <script>
+        const search_content = {{ search_content|tojson }}; // Gets info to be searched through
+        isHealth = true;
+    </script>
+
+    <script src="static/js/search_health.js"></script>
 {% endblock %}
