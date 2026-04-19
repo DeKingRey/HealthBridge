@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("search_input")
     const suggestions = document.getElementById("suggestions")
-    var isHealth;
 
     input.addEventListener("input", () => {
         const query = input.value.trim().toLowerCase(); // Gets the users input and correctly formats
@@ -26,10 +25,16 @@ document.addEventListener("DOMContentLoaded", () => {
             div.addEventListener("click", () => {
                 input.value = match.name;
 
-                if (isHealth)
+                console.log(addHealth);
+                if (addHealth)
                 {
                     document.getElementById("health_info_id").value = div.dataset.id;
                     document.getElementById("existing_info").value = "True";
+
+                    // Autofills form content
+                    document.getElementById("name").value = match.name;
+                    document.getElementById("default_desc").value = match.desc;
+                    document.getElementById("type_id").value = match.type_id;
                 }
 
                 suggestions.innerHTML = "";

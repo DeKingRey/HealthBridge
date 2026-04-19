@@ -12,4 +12,26 @@
     </a>
 </div>
 
+<button onclick="accordionDropdown('health_section_1')" class="w3-button w3-block w3-left-align">
+    Open Test Section
+</button>
+
+<div id="health_section_1" class="w3-container w3-hide">
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+</div>
+
+<script>
+    // Controls accordion content
+    function accordionDropdown(id) {
+        var section = document.getElementById(id);
+        
+        // Checks whether section is currently open or not - then hides/shows accordingly
+        if (section.className.indexOf("w3-show") == -1) {
+            section.className += " w3-show";
+        } else {
+            section.className = section.className.replace(" w3-show", "");
+        }
+    }
+</script>
+
 {% endblock %}

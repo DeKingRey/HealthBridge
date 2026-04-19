@@ -60,7 +60,9 @@ def add_health_info():
 
     health_records = Health.query.all()
     search_content = [
-        {"id": h.id, "name": h.name}
+        {"id": h.id, "name": h.name,
+         "desc": h.default_description,
+         "type_id": h.type_id}
         for h in health_records
     ]
 
@@ -80,8 +82,9 @@ def add_health_info():
                                  type_id=form.type_id.data)
             db.session.add(health_info)
             db.session.commit()
+        # Adds existing info if search was used
         else:
-            # First checks that existing id is in database
+            # Checks that existing info id is in database
             health_info_id = request.form.get("health_info_id")
 
             try:
@@ -263,3 +266,9 @@ def register_email_info(email, remember_flag):
     {verify_url}
     """
     return subject, body
+
+
+def get_type_info(users_only=False):
+    type_info = Type.query.all()
+
+    return type_info
