@@ -6,7 +6,8 @@ from wtforms.validators import (InputRequired, Length, ValidationError,
 from config import (MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH,
                     MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH,
                     MIN_HEALTH_LENGTH, MAX_HEALTH_LENGTH,
-                    MIN_DESC_LENGTH, MAX_DESC_LENGTH)
+                    MIN_DESC_LENGTH, MAX_DESC_LENGTH,
+                    MIN_EMAIL_LENGTH, MAX_EMAIL_LENGTH)
 from . models import User
 
 
@@ -19,7 +20,8 @@ class RegisterForm(FlaskForm):
 
     email = StringField("Email", validators=[
         DataRequired("Please enter an email"),
-        Email(check_deliverability=True)],
+        Email(check_deliverability=True),
+        Length(min=MIN_EMAIL_LENGTH, max=MAX_EMAIL_LENGTH)],
         render_kw={"placeholder": "Email"}
     )
 

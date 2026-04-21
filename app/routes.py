@@ -271,4 +271,6 @@ def register_email_info(email, remember_flag):
 def get_type_info(users_only=False):
     type_info = Type.query.all()
 
+    
+
     return type_info
