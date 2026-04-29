@@ -6,7 +6,7 @@
     <title>Health Bridge</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
 </head>
 <body class="theme">
     <!-- Navbar -->
@@ -18,10 +18,12 @@
 
         <!-- Shows register/login if not logged in, dashboard otherwise -->
         {% if current_user.is_authenticated %}
-            <a href="/dashboard" class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/dashboard' %}accent-colour{% endif %}">
+            <a href="/dashboard"
+            class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/dashboard' %}accent-colour{% endif %}">
                 Dashboard
             </a>
-            <a href="/health-info" class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/health-info' %}accent-colour{% endif %}">
+            <a href="/health-info"
+            class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/health-info' %}accent-colour{% endif %}">
                 Health Info
             </a>
         {% endif %}

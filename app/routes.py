@@ -31,6 +31,18 @@ def generate_verification_token(email):
     return serializer.dumps(email, salt="email-confirm")
 
 
+def confirm_verification_token(token, expiration=3600):
+    try:
+        email = serializer.loads(
+            token,
+            salt="email-confirm",
+            max_age=expiration
+        )
+    except Exception:
+        return None
+    return email
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -50,7 +62,12 @@ def dashboard():
 @main.route("/health-info", methods=["GET", "POST"])
 @login_required
 def health_info():
-    return render_template("health-info.html", header="Health Info")
+    # Gets only the types that the user has in their health records
+    # This is to simplify the display
+    types = get_type_info(True)
+    user_health_entries = get_user_health_entries()
+    return render_template("health-info.html", header="Health Info",
+                           types=types, user_health_entries=user_health_entries)
 
 
 @main.route("/add-health-info", methods=["GET", "POST"])
@@ -58,7 +75,8 @@ def health_info():
 def add_health_info():
     form = AddHealthInfoForm()
 
-    health_records = Health.query.all()
+    # Gets public health info
+    health_records = Health.query.filter_by(is_public=True).all()
     search_content = [
         {"id": h.id, "name": h.name,
          "desc": h.default_description,
@@ -67,19 +85,27 @@ def add_health_info():
     ]
 
     # Populates type choices
-    types = Type.query.all()
-    form.type_id.choices = [(0, "Select a type")] + [(t.id, t.name)
-                                                     for t in types]
+    types = get_type_info()
+    form.type_id.choices = [(-1, "Select a type")] + [(t.id, t.name)
+                                                      for t in types]
 
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
         existing_info = request.form.get("existing_info") == "True"
 
+        # Validates type id
+        if form.type_id.data == -1:
+            form.type_id.errors.append("Please select a valid type")
+            return
+
         # Adds input as new info if it doesn't exist
         if not existing_info:
+            is_public = current_user.is_admin
+
             health_info = Health(name=form.name.data,
                                  default_description=form.default_desc.data,
-                                 type_id=form.type_id.data)
+                                 type_id=form.type_id.data,
+                                 is_public=is_public)
             db.session.add(health_info)
             db.session.commit()
         # Adds existing info if search was used
@@ -90,8 +116,8 @@ def add_health_info():
             try:
                 health_info_id = int(health_info_id)
             except (TypeError, ValueError):
-                return "Invalid ID", 400
-
+                form.name.errors.append("Invalid ID")
+                return
             health_info_ids = [h.id for h in health_records]
 
             # If the id does not exist, it returns an error
@@ -108,6 +134,12 @@ def add_health_info():
         return redirect(url_for("main.health_info"))
     return render_template("add-health-info.html", header="Add Health Info",
                            form=form, search_content=search_content)
+
+
+@main.route("/remove-health-info", methods=["GET", "POST"])
+def remove_health_info():
+    id = request.args.get("id")
+    # Ensure that the user can only delete their own health info
 
 
 @main.route("/login", methods=["GET", "POST"])
@@ -130,8 +162,13 @@ def login():
                     subject, body = register_email_info(user.email,
                                                         remember_flag)
                     send_verification_email(user.email, subject, body)
-                    return render_template("verify-email.html",
-                                           header="Please verify your email")
+
+                    message = "Please check your emails to verify your account"
+                    return render_template("email-sent.html",
+                                           header="Please verify your email",
+                                           message=message)
+            else:
+                form.password.errors.append("Password is incorrect")
     return render_template("login.html", header="Login",
                            form=form)
 
@@ -165,50 +202,68 @@ def register():
         # Sends verification email
         subject, body = register_email_info(form.email.data, remember_flag)
         send_verification_email(form.email.data, subject, body)
-        return render_template("verify-email.html",
-                               header="Please verify your email")
+
+        message = "Please check your emails to verify your account"
+        return render_template("email-sent.html",
+                               header="Please verify your email",
+                               message=message)
     return render_template("register.html", header="Register",
                            form=form)
 
 
 @main.route("/reset-password", methods=["GET", "POST"])
-def reset_password():
+def reset_password_request():
     form = ResetPasswordForm()
-    email_verified = request.args.get("email_verified", "False") == "True"
-    email = request.args.get("email")
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            token = generate_verification_token(user.email)
+
+            reset_url = url_for(
+                "main.reset_password",
+                token=token,
+                forgot_password=True,
+                register=False,
+                _external=True
+            )
+
+            send_verification_email(
+                user.email,
+                "Reset Password Request",
+                f"Click to reset: {reset_url}"
+            )
+        message = "Please check your emails to reset your password"
+        return render_template("email-sent.html",
+                               header="Reset Password",
+                               message=message)
+    return render_template("reset-password.html", form=form,
+                           email_verified=False)
+
+
+@main.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    form = ResetPasswordForm()
+
+    email = confirm_verification_token(token)
+    if not email:
+        return redirect(url_for("main.login"))
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return redirect(url_for("main.login"))
 
     # Send email to user to verify email then allows for password reset
     if form.validate_on_submit():
-        if not email_verified:
-            token = generate_verification_token(form.email.data)
-            verify_url = url_for("main.verify_email",
-                                 token=token,
-                                 forgot_password=True,
-                                 register=False,
-                                 _external=True)
+        # Generates a secure password and updates it
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        user.password = hashed_password
+        db.session.commit()
 
-            subject = "Reset Password Request"
-            body = f"""
-            Click on the link to reset your password:
-
-            {verify_url}
-            """
-            send_verification_email(form.email.data, subject, body)
-        elif email_verified:
-            # Generates a secure password
-            hashed_password = bcrypt.generate_password_hash(form.password.data)
-
-            user = User.query.filter_by(email=email).first()
-            # Updates password
-            if user:
-                user.password = hashed_password
-                db.session.commit()
-                remember_flag = request.form.get("remember") == "True"
-                login_user(user, remember=remember_flag)
-                return redirect(url_for("main.dashboard"))
-            return redirect(url_for("main.login"))
+        login_user(user)
+        return redirect(url_for("main.dashboard"))
     return render_template("reset-password.html", header="Reset Password",
-                           form=form, email_verified=email_verified)
+                           form=form, email_verified=True)
 
 
 @main.route("/verify/<token>")
@@ -218,7 +273,6 @@ def verify_email(token):
     except ValueError:
         return "Verification link expired or invalid"
 
-    forgot_password = request.args.get("forgot_password", "False") == "True"
     register = request.args.get("register", "False") == "True"
     user = User.query.filter_by(email=email).first()
 
@@ -230,10 +284,6 @@ def verify_email(token):
             remember_flag = request.args.get("remember", "False") == "True"
             login_user(user, remember=remember_flag)
             return redirect(url_for("main.dashboard"))
-        elif forgot_password:
-            return redirect(url_for("main.reset_password",
-                                    email_verified=True,
-                                    email=email))
     return redirect(url_for("main.login"))
 
 
@@ -271,6 +321,31 @@ def register_email_info(email, remember_flag):
 def get_type_info(users_only=False):
     type_info = Type.query.all()
 
-    
+    # Will return only types that the user has in their health records
+    if users_only:
+        new_type_info = []
+
+        # Gets the specific type ids from the health records of the user
+        user_types = db.session.query(Health.type_id).join(UserHealth).filter(
+            UserHealth.user_id == current_user.id
+        ).all()
+
+        user_types_ids = {t[0] for t in user_types}
+
+        # Only adds types that the user has in their records
+        for type in type_info:
+            if type.id in user_types_ids:
+                new_type_info.append(type)
+        type_info = new_type_info
 
     return type_info
+
+
+# Gets users personal health info
+def get_user_health_entries():
+    # Gets all users health info
+    user_health_entries = db.session.query(UserHealth).join(UserHealth).filter(
+        UserHealth.user_id == current_user.id
+    ).all()
+
+    return user_health_entries

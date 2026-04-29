@@ -1,5 +1,7 @@
 # Constants
 
+DATABASE_URL = "sqlite:///healthbridge.db"
+
 MIN_USERNAME_LENGTH = 4
 MAX_USERNAME_LENGTH = 80
 

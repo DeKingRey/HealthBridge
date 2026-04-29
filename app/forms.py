@@ -53,7 +53,8 @@ class RegisterForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[
         InputRequired("Please eneter an email"),
-        Email(check_deliverability=True)],
+        Email(check_deliverability=True),
+        Length(min=MIN_EMAIL_LENGTH, max=MAX_EMAIL_LENGTH)],
         render_kw={"placeholder": "Email"})
 
     password = PasswordField("Password", validators=[
@@ -68,6 +69,7 @@ class LoginForm(FlaskForm):
 class ResetPasswordForm(FlaskForm):
     email = StringField("Email", validators=[
         Email(check_deliverability=True),
+        Length(min=MIN_EMAIL_LENGTH, max=MAX_EMAIL_LENGTH),
         Optional()],
         render_kw={"placeholder": "Email"})
 
@@ -110,6 +112,13 @@ class AddHealthInfoForm(FlaskForm):
     )
 
     type_id = SelectField("Type", choices=[], coerce=int,
-                          validators=[DataRequired()])
+                          validators=[InputRequired()])
 
     submit = SubmitField("Add Info")
+
+    # Ensures type id is not negative or invalid
+    def validate_type_id(self, type_id):
+        if type_id.data < 0:
+            raise ValidationError(
+                "Type ID is invalid"
+            )

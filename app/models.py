@@ -8,6 +8,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False)
 
     user_links = db.relationship("UserHealth", back_populates="user")
 
@@ -26,14 +27,18 @@ class Health(db.Model):
 
     type_id = db.Column(db.Integer,
                         db.ForeignKey("type.id"))
+
+    is_public = db.Column(db.Boolean, default=False)
+
     health_links = db.relationship("UserHealth", back_populates="health")
 
 
 class UserHealth(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer,
-                        db.ForeignKey("user.id"), primary_key=True)
+                        db.ForeignKey("user.id"), nullable=False)
     health_id = db.Column(db.Integer,
-                          db.ForeignKey("health.id"), primary_key=True)
+                          db.ForeignKey("health.id"), nullable=False)
     description = db.Column(db.String(500))
 
     user = db.relationship("User", back_populates="user_links")
