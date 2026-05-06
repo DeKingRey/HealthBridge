@@ -12,7 +12,7 @@ Date: 27-02-2026
 """
 
 from flask import (render_template, Blueprint, url_for,
-                   redirect, request)
+                   redirect, request, make_response)
 from flask_login import (login_required, login_user, logout_user,
                          current_user)
 from app.models import (User, Health, UserHealth, Type)
@@ -21,6 +21,7 @@ from app.forms import (RegisterForm, LoginForm, ResetPasswordForm,
 from app import db, bcrypt, login_manager, mail
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
+from weasyprint import HTML
 import os
 
 main = Blueprint("main", __name__)
@@ -92,6 +93,7 @@ def add_health_info():
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
         existing_info = request.form.get("existing_info") == "True"
+        print(existing_info)
 
         # Validates type id
         if form.type_id.data == -1:
@@ -117,12 +119,15 @@ def add_health_info():
                 health_info_id = int(health_info_id)
             except (TypeError, ValueError):
                 form.name.errors.append("Invalid ID")
-                return
+                return render_template("add-health-info.html", header="Add Health Info",
+                           form=form, search_content=search_content)
             health_info_ids = [h.id for h in health_records]
 
             # If the id does not exist, it returns an error
             if health_info_id not in health_info_ids:
-                return
+                form.name.errors.append("Invalid ID")
+                return render_template("add-health-info.html", header="Add Health Info",
+                           form=form, search_content=search_content)
             health_info = Health.query.filter_by(id=health_info_id).first()
         # Adds new health info
         new_user_health_info = UserHealth(user_id=current_user.id,
@@ -138,8 +143,63 @@ def add_health_info():
 
 @main.route("/remove-health-info", methods=["GET", "POST"])
 def remove_health_info():
-    id = request.args.get("id")
-    # Ensure that the user can only delete their own health info
+    entry_id = request.form.get("entry_id")
+
+    # First ensures that the entry exists and belongs to the user
+    user_health_entry = UserHealth.query.get(entry_id)
+    if not user_health_entry:
+        return "Not found", 404
+
+    if user_health_entry.user_id != current_user.id:
+        return "Unauthorized", 403
+    
+    # Deletes user health entry
+    db.session.delete(user_health_entry)
+    db.session.commit()
+    return redirect(url_for("main.health_info"))
+
+
+@main.route("/send-health-info", methods=["POST"])
+def send_health_info():
+    email = request.form.get("receiver_email")
+
+    user_info = User.query.get(current_user.id)
+    subject = f"Health Info for {user_info.username}"
+    body = f"Attached is all health information for {user_info.username}."
+    pdf = generate_health_pdf(user_info)
+
+    send_email(email, subject, body, attachments=[("patient_summary.pdf", "application/pdf", pdf)])
+
+    return redirect(url_for("main.health-info"))
+
+
+@main.route("/download-health-pdf")
+def download_health_pdf():
+    user_info = User.query.get(current_user.id)
+    pdf = generate_health_pdf(user_info)
+
+    response = make_response(pdf)
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = "attachment; filename=patient_summary.pdf"
+
+    return response
+
+
+def generate_health_pdf(user):
+    types = get_type_info(True)
+    user_health_entries = get_user_health_entries()
+
+    data = {
+        "name": user.username,
+        "dob": "placeholder dob",
+        "types": types,
+        "user_health_entries": user_health_entries
+    }
+
+    html = render_template("health-pdf-template.html", **data)
+    pdf = HTML(string=html).write_pdf()
+
+    return pdf
 
 
 @main.route("/login", methods=["GET", "POST"])
@@ -161,7 +221,7 @@ def login():
                 else:
                     subject, body = register_email_info(user.email,
                                                         remember_flag)
-                    send_verification_email(user.email, subject, body)
+                    send_email(user.email, subject, body)
 
                     message = "Please check your emails to verify your account"
                     return render_template("email-sent.html",
@@ -201,7 +261,7 @@ def register():
 
         # Sends verification email
         subject, body = register_email_info(form.email.data, remember_flag)
-        send_verification_email(form.email.data, subject, body)
+        send_email(form.email.data, subject, body)
 
         message = "Please check your emails to verify your account"
         return render_template("email-sent.html",
@@ -228,7 +288,7 @@ def reset_password_request():
                 _external=True
             )
 
-            send_verification_email(
+            send_email(
                 user.email,
                 "Reset Password Request",
                 f"Click to reset: {reset_url}"
@@ -287,14 +347,22 @@ def verify_email(token):
     return redirect(url_for("main.login"))
 
 
-def send_verification_email(email, subject, body):
-    # Send a verification email to the user
+def send_email(email, subject, body, attachments=None):
+    # Send an email to the specified email
     subject = subject
     msg = Message(subject=subject,
                   recipients=[email]
                   )
 
     msg.body = body
+
+    print(f"attachments: {attachments}")
+
+    if attachments:
+        for attachment in attachments:
+            print(attachment)
+            msg.attach(*attachment)
+
     mail.send(msg)
 
 
@@ -344,7 +412,7 @@ def get_type_info(users_only=False):
 # Gets users personal health info
 def get_user_health_entries():
     # Gets all users health info
-    user_health_entries = db.session.query(UserHealth).join(UserHealth).filter(
+    user_health_entries = db.session.query(UserHealth).join(Health).filter(
         UserHealth.user_id == current_user.id
     ).all()
 

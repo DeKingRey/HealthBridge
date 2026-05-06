@@ -1,0 +1,35 @@
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 40px;
+        }
+        h1 {
+            border-bottom: 2px solid #333;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Patient Summary</h1>
+
+    <div class="section">
+        <strong>Name: </strong> {{ name }} <br>
+        <strong>DOB: </strong> {{ dob }} <br>
+    </div>
+
+    {% for type in types %}
+        <h2>{{ type.name }}</h2>
+        {% for entry in user_health_entries %}
+            {% if entry.health.type_id == type.id %}
+                <p><strong>{{ entry.health.name }}</strong></p>
+                <p>{{ entry.description }}</p>
+                <br>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</body>
+</html>

@@ -5,8 +5,8 @@
         {{ form.hidden_tag() }}
 
         <!-- Hidden inputs if the user uses pre existing info -->
-        <input type="hidden" id="health_info_id">
-        <input type="hidden" id="existing_info">
+        <input type="hidden" id="health_info_id" name="health_info_id">
+        <input type="hidden" id="existing_info" name="existing_info" value="False">
         
         <!-- Search input for pre existing health records -->
         <div>
@@ -47,8 +47,10 @@
                 <p style="color: red;">{{ error }}</p>
             {% endfor %}
         </div>
-    
-        {{ form.submit }}
+        
+        <div class="w3-btn w3-round-xlarge btn-hover-colour accent-colour" style="margin-bottom: 20px;">
+            {{ form.submit }}
+        </div>
     </form>
 
     <a href="{{ url_for('main.health_info') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">

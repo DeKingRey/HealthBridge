@@ -7,9 +7,35 @@
     <a href="/add-health-info" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
         Add Health Information
     </a>
-    <a href="/send-to-doctor" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
-        Send Information to Doctor
+    <button onclick="toggleModal('modal_send_info')" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+        Send Health Information
+    </button>
+    <a href="/download-health-pdf" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+        Download Health PDF
     </a>
+</div>
+
+ <!-- Send health info popup -->
+<div id="modal_send_info" class="w3-modal">
+    <div class="w3-modal-content">
+        <div class="w3-container">
+            <form method="POST" action="/send-health-info">
+                <label for="receiver_email">Enter receivers email: </label>
+                <input type="text" name="receiver_email">
+
+                <button type="submit"
+                        onclick="toggleModal('modal_send_info')"
+                        class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+                    Send
+                </button>
+            </form>
+
+            <span onclick="toggleModal('modal_send_info')"
+            class="w3-button">
+                Cancel
+            </span>
+        </div>
+    </div>
 </div>
 
 <!-- Dropdowns for each health category showing user their health info -->
@@ -26,27 +52,33 @@
             {% for entry in user_health_entries %}
                 {% if entry.health.type_id == type.id %}
                     <li class="w3-display-container">
-                        <button onclick="document.getElementById('modal_{{ entry.id }}').style.display='block'"
+                        <button onclick="toggleModal('modal_{{ entry.id }}')"
                         class="w3-btn w3-circle error-colour w3-display-topright btn-hover-red">
                             <i class="fa-regular fa-trash-can"></i>
                         </button>
                         <p><strong>{{ entry.health.name }}</strong></p>
-                        <p>{{ entry.default_description }}</p>
+                        <p>{{ entry.description }}</p>
                     </li>
                     
                     <!-- Delete health info popup -->
                     <div id="modal_{{ entry.id }}" class="w3-modal">
                         <div class="w3-modal-content">
                             <div class="w3-container">
-                                <span onclick="document.getElementById('modal_{{ entry.id }}').style.display='none'"
+                                <p>Are you sure you want to delete: <strong>{{ entry.health.name }}</strong>?</p>
+                                <span onclick="toggleModal('modal_{{ entry.id }}')"
                                 class="w3-button">
                                     Cancel
                                 </span>
-
-                                <span onclick="document.getElementById('modal_{{ entry.id }}').style.display='none'"
-                                class="w3-btn w3-error-colour">
-                                    Delete
-                                </span>
+                                
+                                <form method="POST" action="/remove-health-info">
+                                    <input type="hidden" name="entry_id" value="{{ entry.id }}">
+                                    
+                                    <button type="submit"
+                                            onclick="toggleModal('modal_{{ entry.id }}')"
+                                            class="w3-btn w3-error-colour">
+                                        Confirm Delete
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -56,6 +88,7 @@
     {% endfor %}
 </div>
 
+<script src="static/js/modal.js"></script>
 <script>
     // Controls accordion content
     function accordionDropdown(id) {
