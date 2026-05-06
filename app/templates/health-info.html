@@ -21,10 +21,9 @@
         <div class="w3-container">
             <form method="POST" action="/send-health-info">
                 <label for="receiver_email">Enter receivers email: </label>
-                <input type="text" name="receiver_email">
+                <input type="email" name="receiver_email" id="receiver_email" required>
 
                 <button type="submit"
-                        onclick="toggleModal('modal_send_info')"
                         class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
                     Send
                 </button>
@@ -32,7 +31,7 @@
 
             <span onclick="toggleModal('modal_send_info')"
             class="w3-button">
-                Cancel
+                Close
             </span>
         </div>
     </div>

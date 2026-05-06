@@ -3,4 +3,11 @@
 
 <p>{{ message }}</p>
 
+{% if email_failed %}
+    <button onclick="history.back()"
+    class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+        Go Back
+    </button>
+{% endif %}
+
 {% endblock %}

@@ -22,6 +22,7 @@ from app import db, bcrypt, login_manager, mail
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 from weasyprint import HTML
+from email_validator import validate_email, EmailNotValidError
 import os
 
 main = Blueprint("main", __name__)
@@ -163,6 +164,14 @@ def remove_health_info():
 def send_health_info():
     email = request.form.get("receiver_email")
 
+    try:
+        valid = validate_email(email)
+        email = valid.email
+    except EmailNotValidError as e:
+        return render_template("email-sent.html",
+                                header="Invalid Email Address",
+                                message="The email you inputted was invalid", email_failed=True)
+
     user_info = User.query.get(current_user.id)
     subject = f"Health Info for {user_info.username}"
     body = f"Attached is all health information for {user_info.username}."
@@ -170,7 +179,7 @@ def send_health_info():
 
     send_email(email, subject, body, attachments=[("patient_summary.pdf", "application/pdf", pdf)])
 
-    return redirect(url_for("main.health-info"))
+    return redirect(url_for("main.health_info"))
 
 
 @main.route("/download-health-pdf")
@@ -202,6 +211,11 @@ def generate_health_pdf(user):
     return pdf
 
 
+@main.route("/reminders")
+def reminders():
+    return render_template("reminders.html", header="Reminders")
+
+
 @main.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
@@ -226,7 +240,7 @@ def login():
                     message = "Please check your emails to verify your account"
                     return render_template("email-sent.html",
                                            header="Please verify your email",
-                                           message=message)
+                                           message=message, email_failed=False)
             else:
                 form.password.errors.append("Password is incorrect")
     return render_template("login.html", header="Login",
@@ -266,7 +280,7 @@ def register():
         message = "Please check your emails to verify your account"
         return render_template("email-sent.html",
                                header="Please verify your email",
-                               message=message)
+                               message=message, email_failed=False)
     return render_template("register.html", header="Register",
                            form=form)
 
@@ -296,7 +310,7 @@ def reset_password_request():
         message = "Please check your emails to reset your password"
         return render_template("email-sent.html",
                                header="Reset Password",
-                               message=message)
+                               message=message, email_failed=False)
     return render_template("reset-password.html", form=form,
                            email_verified=False)
 
@@ -356,11 +370,8 @@ def send_email(email, subject, body, attachments=None):
 
     msg.body = body
 
-    print(f"attachments: {attachments}")
-
     if attachments:
         for attachment in attachments:
-            print(attachment)
             msg.attach(*attachment)
 
     mail.send(msg)

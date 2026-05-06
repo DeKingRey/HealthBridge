@@ -7,7 +7,8 @@ from config import (MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH,
                     MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH,
                     MIN_HEALTH_LENGTH, MAX_HEALTH_LENGTH,
                     MIN_DESC_LENGTH, MAX_DESC_LENGTH,
-                    MIN_EMAIL_LENGTH, MAX_EMAIL_LENGTH)
+                    MIN_EMAIL_LENGTH, MAX_EMAIL_LENGTH,
+                    MIN_REMINDER_LENGTH, MAX_REMINDER_LENGTH)
 from . models import User
 
 
@@ -122,3 +123,14 @@ class AddHealthInfoForm(FlaskForm):
             raise ValidationError(
                 "Type ID is invalid"
             )
+        
+class AddReminder(FlaskForm):
+    name = StringField("Name", validators=[
+        InputRequired(),
+        Length(min=MIN_REMINDER_LENGTH, max=MAX_REMINDER_LENGTH)],
+        render_kw={"placeholder": "Name"}
+    )
+
+    reminder_type = SelectField(
+        choices=[("medication", "Medication"), ("appointment", "Appointment")]
+    )
