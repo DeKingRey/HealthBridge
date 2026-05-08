@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <style>
+        #appointment_fields,
+        #medication_fields {
+            display: none;
+        }
+    </style>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <!-- Name Div -->
+        <div>
+            {{ form.name.label }}
+            {{ form.name }}
+
+            {% for error in form.name.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <!-- Description Div -->
+        <div>
+            {{ form.desc.label }}
+            {{ form.desc }}
+            
+            {% for error in form.desc.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <!-- Type ID Div -->
+        <div>
+            {{ form.type_id.label }}
+            {{ form.type_id(id="reminder_type", onchange="toggleFields()") }}
+
+            {% for error in form.type_id.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div id="appointment_fields">
+            {{ form.appointment_datetime.label }}
+            {{ form.appointment_datetime(type="datetime-local") }}
+
+            {% for error in form.appointment_datetime.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div id="medication_fields">
+            {{ form.medication_time.label }}
+            {{ form.medication_time }}
+
+            {% for error in form.medication_time.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+        
+        <div class="w3-btn w3-round-xlarge btn-hover-colour accent-colour" style="margin-bottom: 20px;">
+            {{ form.submit }}
+        </div>
+    </form>
+
+    <a href="{{ url_for('main.reminders') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+        Return
+    </a>
+
+    <script>
+        function toggleFields() {
+            const type = document.getElementById("reminder_type").value;
+
+            document.getElementById("appointment_fields").style.display = 
+                type === "1" ? "block" : "none";
+            
+            document.getElementById("medication_fields").style.display = 
+                type === "2" ? "block" : "none";
+        }
+
+        document.addEventListener("DOMContentLoaded", toggleFields);
+    </script>
+{% endblock %}

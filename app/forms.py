@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, SubmitField,
-                     TextAreaField, SelectField)
+                     TextAreaField, SelectField, TimeField,
+                     DateTimeField)
 from wtforms.validators import (InputRequired, Length, ValidationError,
                                 EqualTo, Email, DataRequired, Optional)
 from config import (MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH,
@@ -124,13 +125,30 @@ class AddHealthInfoForm(FlaskForm):
                 "Type ID is invalid"
             )
         
-class AddReminder(FlaskForm):
+class AddReminderForm(FlaskForm):
     name = StringField("Name", validators=[
         InputRequired(),
         Length(min=MIN_REMINDER_LENGTH, max=MAX_REMINDER_LENGTH)],
         render_kw={"placeholder": "Name"}
     )
 
-    reminder_type = SelectField(
-        choices=[("medication", "Medication"), ("appointment", "Appointment")]
+    desc = TextAreaField("Description", validators=[
+        InputRequired(),
+        Length(min=MIN_DESC_LENGTH, max=MAX_DESC_LENGTH)],
+        render_kw={"placeholder": "Description"}
     )
+
+    type_id = SelectField("Type", choices=[], coerce=int,
+                          validators=[InputRequired()])
+
+    appointment_datetime = DateTimeField(
+        "Appointment Date & Time",
+        format="%Y-%m-%d %H:%M"
+    )
+
+    medication_time = TimeField(
+        "Medication Time",
+        format="%H:%M"
+    )
+
+    submit = SubmitField("Add Reminder")

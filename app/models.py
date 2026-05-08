@@ -11,9 +11,10 @@ class User(db.Model, UserMixin):
     is_admin = db.Column(db.Boolean, default=False)
 
     user_links = db.relationship("UserHealth", back_populates="user")
+    reminder = db.relationship("Reminder", backref="user", lazy=True)
 
 
-class Type(db.Model):
+class HealthType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
 
@@ -26,7 +27,7 @@ class Health(db.Model):
     default_description = db.Column(db.String(500))
 
     type_id = db.Column(db.Integer,
-                        db.ForeignKey("type.id"))
+                        db.ForeignKey("health_type.id"))
 
     is_public = db.Column(db.Boolean, default=False)
 
@@ -43,3 +44,23 @@ class UserHealth(db.Model):
 
     user = db.relationship("User", back_populates="user_links")
     health = db.relationship("Health", back_populates="health_links")
+
+
+class ReminderType(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+
+    reminder = db.relationship("Reminder", backref="type", lazy=True)
+
+
+class Reminder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("user.id"), nullable=False)
+    
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(500))
+
+    type_id = db.Column(db.Integer, db.ForeignKey("reminder_type.id"))
+
+    scheduled_time = db.Column(db.DateTime, nullable=False)

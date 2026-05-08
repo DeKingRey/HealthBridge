@@ -15,9 +15,10 @@ from flask import (render_template, Blueprint, url_for,
                    redirect, request, make_response)
 from flask_login import (login_required, login_user, logout_user,
                          current_user)
-from app.models import (User, Health, UserHealth, Type)
+from app.models import (User, Health, UserHealth, HealthType,
+                        Reminder, ReminderType)
 from app.forms import (RegisterForm, LoginForm, ResetPasswordForm,
-                       AddHealthInfoForm)
+                       AddHealthInfoForm, AddReminderForm)
 from app import db, bcrypt, login_manager, mail
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
@@ -94,7 +95,6 @@ def add_health_info():
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
         existing_info = request.form.get("existing_info") == "True"
-        print(existing_info)
 
         # Validates type id
         if form.type_id.data == -1:
@@ -214,6 +214,37 @@ def generate_health_pdf(user):
 @main.route("/reminders")
 def reminders():
     return render_template("reminders.html", header="Reminders")
+
+
+@main.route("/add-reminder", methods=["GET", "POST"])
+@login_required
+def add_reminder():
+    form = AddReminderForm()
+
+    # Populates type choices
+    types = ReminderType.query.all()
+    form.type_id.choices = [(-1, "Select a type")] + [(t.id, t.name)
+                                                      for t in types]
+
+    # Adds info to database if validated succesfully
+    if form.validate_on_submit():
+
+        # Validates type id
+        if form.type_id.data == -1:
+            form.type_id.errors.append("Please select a valid type")
+            return
+
+        reminder = Reminder(user_id=current_user.id,
+                                name=form.name.data,
+                                description=form.desc.data,
+                                type_id=form.type_id.data,
+                                scheduled_time=form.scheduled_time.data)
+        db.session.add(reminder)
+        db.session.commit()
+
+        return redirect(url_for("main.reminders"))
+    return render_template("add-reminder.html", header="Add Reminder",
+                           form=form)
 
 
 @main.route("/login", methods=["GET", "POST"])
@@ -398,7 +429,7 @@ def register_email_info(email, remember_flag):
 
 
 def get_type_info(users_only=False):
-    type_info = Type.query.all()
+    type_info = HealthType.query.all()
 
     # Will return only types that the user has in their health records
     if users_only:
