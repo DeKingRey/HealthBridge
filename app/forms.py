@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, SubmitField,
-                     TextAreaField, SelectField, TimeField,
-                     DateTimeField)
+                     TextAreaField, SelectField, TimeField)
 from wtforms.validators import (InputRequired, Length, ValidationError,
                                 EqualTo, Email, DataRequired, Optional)
 from wtforms.fields import DateTimeLocalField
@@ -125,7 +124,8 @@ class AddHealthInfoForm(FlaskForm):
             raise ValidationError(
                 "Type ID is invalid"
             )
-        
+
+
 class AddReminderForm(FlaskForm):
     name = StringField("Name", validators=[
         InputRequired(),

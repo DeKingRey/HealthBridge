@@ -25,7 +25,8 @@ from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 from weasyprint import HTML
 from email_validator import validate_email, EmailNotValidError
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+from config import (APPOINTMENT_ID, MEDICATION_ID)
 import os
 
 main = Blueprint("main", __name__)
@@ -72,7 +73,8 @@ def health_info():
     types = get_type_info(True)
     user_health_entries = get_user_health_entries()
     return render_template("health-info.html", header="Health Info",
-                           types=types, user_health_entries=user_health_entries)
+                           types=types,
+                           user_health_entries=user_health_entries)
 
 
 @main.route("/add-health-info", methods=["GET", "POST"])
@@ -117,15 +119,19 @@ def add_health_info():
                 health_info_id = int(health_info_id)
             except (TypeError, ValueError):
                 form.name.errors.append("Invalid ID")
-                return render_template("add-health-info.html", header="Add Health Info",
-                           form=form, search_content=search_content)
+                return render_template("add-health-info.html",
+                                       header="Add Health Info",
+                                       form=form,
+                                       search_content=search_content)
             health_info_ids = [h.id for h in health_records]
 
             # If the id does not exist, it returns an error
             if health_info_id not in health_info_ids:
                 form.name.errors.append("Invalid ID")
-                return render_template("add-health-info.html", header="Add Health Info",
-                           form=form, search_content=search_content)
+                return render_template("add-health-info.html",
+                                       header="Add Health Info",
+                                       form=form,
+                                       search_content=search_content)
             health_info = Health.query.filter_by(id=health_info_id).first()
         # Adds new health info
         new_user_health_info = UserHealth(user_id=current_user.id,
@@ -150,7 +156,7 @@ def remove_health_info():
 
     if user_health_entry.user_id != current_user.id:
         return "Unauthorized", 403
-    
+
     # Deletes user health entry
     db.session.delete(user_health_entry)
     db.session.commit()
@@ -164,17 +170,19 @@ def send_health_info():
     try:
         valid = validate_email(email)
         email = valid.email
-    except EmailNotValidError as e:
+    except EmailNotValidError:
         return render_template("email-sent.html",
-                                header="Invalid Email Address",
-                                message="The email you inputted was invalid", email_failed=True)
+                               header="Invalid Email Address",
+                               message="The email you inputted was invalid",
+                               email_failed=True)
 
     user_info = User.query.get(current_user.id)
     subject = f"Health Info for {user_info.username}"
     body = f"Attached is all health information for {user_info.username}."
     pdf = generate_health_pdf(user_info)
 
-    send_email(email, subject, body, attachments=[("patient_summary.pdf", "application/pdf", pdf)])
+    send_email(email, subject, body, attachments=[("patient_summary.pdf",
+                                                   "application/pdf", pdf)])
 
     return redirect(url_for("main.health_info"))
 
@@ -186,7 +194,8 @@ def download_health_pdf():
 
     response = make_response(pdf)
     response.headers["Content-Type"] = "application/pdf"
-    response.headers["Content-Disposition"] = "attachment; filename=patient_summary.pdf"
+    response.headers["Content-Disposition"] = """attachment;
+                                                filename=patient_summary.pdf"""
 
     return response
 
@@ -225,19 +234,32 @@ def add_reminder():
 
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
+        local_tz = datetime.now().astimezone().tzinfo
+
         # Appointment Reminder
-        if form.type_id.data == 1:
-            scheduled_time = form.appointment_datetime.data
+        if form.type_id.data == APPOINTMENT_ID:
+            scheduled_time = form.appointment_datetime.data.replace(
+                tzinfo=local_tz)
+            # Converts to UTC for scheduling
+            scheduled_time = scheduled_time.astimezone(timezone.utc)
+
         # Medication Reminder
-        elif form.type_id.data == 2:
+        elif form.type_id.data == MEDICATION_ID:
             med_time = form.medication_time.data
-            scheduled_time = datetime.combine(datetime.today().date(), med_time)
+            scheduled_time = datetime.combine(datetime.today().date(),
+                                              med_time, tzinfo=local_tz)
+            # Converts to UTC for scheduling
+            scheduled_time = scheduled_time.astimezone(timezone.utc)
+
+            # Schedules for tomorrow if time has already passed
+            if scheduled_time < datetime.now(timezone.utc):
+                scheduled_time += timedelta(days=1)
 
         reminder = Reminder(user_id=current_user.id,
-                                name=form.name.data,
-                                description=form.desc.data,
-                                type_id=form.type_id.data,
-                                scheduled_time=scheduled_time)
+                            name=form.name.data,
+                            description=form.desc.data,
+                            type_id=form.type_id.data,
+                            scheduled_time=scheduled_time)
         db.session.add(reminder)
         db.session.commit()
 
@@ -245,8 +267,9 @@ def add_reminder():
         send_reminder_email.apply_async(
             args=[
                 current_user.email,
-                "Reminder",
-                "TESTTESTETSTT hi!"
+                form.name.data,
+                form.desc.data,
+                
             ],
             eta=scheduled_time
         )
