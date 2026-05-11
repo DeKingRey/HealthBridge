@@ -4,6 +4,7 @@ from wtforms import (StringField, PasswordField, SubmitField,
                      DateTimeField)
 from wtforms.validators import (InputRequired, Length, ValidationError,
                                 EqualTo, Email, DataRequired, Optional)
+from wtforms.fields import DateTimeLocalField
 from config import (MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH,
                     MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH,
                     MIN_HEALTH_LENGTH, MAX_HEALTH_LENGTH,
@@ -141,14 +142,23 @@ class AddReminderForm(FlaskForm):
     type_id = SelectField("Type", choices=[], coerce=int,
                           validators=[InputRequired()])
 
-    appointment_datetime = DateTimeField(
+    appointment_datetime = DateTimeLocalField(
         "Appointment Date & Time",
-        format="%Y-%m-%d %H:%M"
+        format="%Y-%m-%dT%H:%M",
+        validators=[Optional()]
     )
 
     medication_time = TimeField(
         "Medication Time",
-        format="%H:%M"
+        format="%H:%M",
+        validators=[Optional()]
     )
 
     submit = SubmitField("Add Reminder")
+
+    # Ensures type id is not negative or invalid
+    def validate_type_id(self, type_id):
+        if type_id.data < 0:
+            raise ValidationError(
+                "Type ID is invalid"
+            )

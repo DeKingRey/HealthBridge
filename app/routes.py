@@ -20,10 +20,12 @@ from app.models import (User, Health, UserHealth, HealthType,
 from app.forms import (RegisterForm, LoginForm, ResetPasswordForm,
                        AddHealthInfoForm, AddReminderForm)
 from app import db, bcrypt, login_manager, mail
+from app.tasks import send_reminder_email
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 from weasyprint import HTML
 from email_validator import validate_email, EmailNotValidError
+from datetime import datetime
 import os
 
 main = Blueprint("main", __name__)
@@ -95,11 +97,6 @@ def add_health_info():
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
         existing_info = request.form.get("existing_info") == "True"
-
-        # Validates type id
-        if form.type_id.data == -1:
-            form.type_id.errors.append("Please select a valid type")
-            return
 
         # Adds input as new info if it doesn't exist
         if not existing_info:
@@ -228,19 +225,31 @@ def add_reminder():
 
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
-
-        # Validates type id
-        if form.type_id.data == -1:
-            form.type_id.errors.append("Please select a valid type")
-            return
+        # Appointment Reminder
+        if form.type_id.data == 1:
+            scheduled_time = form.appointment_datetime.data
+        # Medication Reminder
+        elif form.type_id.data == 2:
+            med_time = form.medication_time.data
+            scheduled_time = datetime.combine(datetime.today().date(), med_time)
 
         reminder = Reminder(user_id=current_user.id,
                                 name=form.name.data,
                                 description=form.desc.data,
                                 type_id=form.type_id.data,
-                                scheduled_time=form.scheduled_time.data)
+                                scheduled_time=scheduled_time)
         db.session.add(reminder)
         db.session.commit()
+
+        # TEST - TEMPORARY REMMEBER TO DELETE
+        send_reminder_email.apply_async(
+            args=[
+                current_user.email,
+                "Reminder",
+                "TESTTESTETSTT hi!"
+            ],
+            eta=scheduled_time
+        )
 
         return redirect(url_for("main.reminders"))
     return render_template("add-reminder.html", header="Add Reminder",

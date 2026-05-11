@@ -43,7 +43,7 @@
 
         <div id="appointment_fields">
             {{ form.appointment_datetime.label }}
-            {{ form.appointment_datetime(type="datetime-local") }}
+            {{ form.appointment_datetime }}
 
             {% for error in form.appointment_datetime.errors %}
                 <p style="color: red;">{{ error }}</p>
