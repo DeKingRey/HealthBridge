@@ -20,7 +20,6 @@ from app.models import (User, Health, UserHealth, HealthType,
 from app.forms import (RegisterForm, LoginForm, ResetPasswordForm,
                        AddHealthInfoForm, AddReminderForm)
 from app import db, bcrypt, login_manager, mail
-from app.tasks import send_reminder_email
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 from weasyprint import HTML
@@ -225,6 +224,7 @@ def reminders():
 @main.route("/add-reminder", methods=["GET", "POST"])
 @login_required
 def add_reminder():
+    from app.tasks import send_reminder_email
     form = AddReminderForm()
 
     # Populates type choices
@@ -269,7 +269,7 @@ def add_reminder():
                 current_user.email,
                 form.name.data,
                 form.desc.data,
-                
+                reminder.id
             ],
             eta=scheduled_time
         )

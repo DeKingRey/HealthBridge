@@ -1,19 +1,9 @@
 from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
-from flask_migrate import Migrate
 from dotenv import load_dotenv
-from flask_mail import Mail
 from config import DATABASE_URL
 import os
+from .extensions import (db, mail, bcrypt, login_manager, migrate)
 
-# Sets up extensions
-db = SQLAlchemy()
-bcrypt = Bcrypt()
-login_manager = LoginManager()
-migrate = Migrate()
-mail = Mail()
 load_dotenv()
 
 
