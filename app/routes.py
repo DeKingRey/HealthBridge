@@ -69,7 +69,7 @@ def dashboard():
 def health_info():
     # Gets only the types that the user has in their health records
     # This is to simplify the display
-    types = get_type_info(True)
+    types = get_health_type_info(True)
     user_health_entries = get_user_health_entries()
     return render_template("health-info.html", header="Health Info",
                            types=types,
@@ -91,7 +91,7 @@ def add_health_info():
     ]
 
     # Populates type choices
-    types = get_type_info()
+    types = get_health_type_info()
     form.type_id.choices = [(-1, "Select a type")] + [(t.id, t.name)
                                                       for t in types]
 
@@ -200,7 +200,7 @@ def download_health_pdf():
 
 
 def generate_health_pdf(user):
-    types = get_type_info(True)
+    types = get_health_type_info(True)
     user_health_entries = get_user_health_entries()
 
     data = {
@@ -218,7 +218,29 @@ def generate_health_pdf(user):
 
 @main.route("/reminders")
 def reminders():
-    return render_template("reminders.html", header="Reminders")
+    # Only gets types that user has reminders for
+    types = get_reminder_type_info(True)
+    user_reminders = get_user_reminders()
+    return render_template("reminders.html", header="Reminders",
+                           types=types, user_reminders=user_reminders)
+
+
+@main.route("/remove-reminder", methods=["GET", "POST"])
+def remove_reminder():
+    reminder_id = request.form.get("reminder_id")
+
+    # First ensures that the reminder exists and belongs to the user
+    user_reminder = Reminder.query.get(reminder_id)
+    if not user_reminder:
+        return "Not found", 404
+
+    if user_reminder.user_id != current_user.id:
+        return "Unauthorized", 403
+
+    # Deletes reminder
+    db.session.delete(user_reminder)
+    db.session.commit()
+    return redirect(url_for("main.reminders"))
 
 
 @main.route("/add-reminder", methods=["GET", "POST"])
@@ -228,7 +250,7 @@ def add_reminder():
     form = AddReminderForm()
 
     # Populates type choices
-    types = ReminderType.query.all()
+    types = get_reminder_type_info()
     form.type_id.choices = [(-1, "Select a type")] + [(t.id, t.name)
                                                       for t in types]
 
@@ -460,7 +482,7 @@ def register_email_info(email, remember_flag):
     return subject, body
 
 
-def get_type_info(users_only=False):
+def get_health_type_info(users_only=False):
     type_info = HealthType.query.all()
 
     # Will return only types that the user has in their health records
@@ -483,6 +505,29 @@ def get_type_info(users_only=False):
     return type_info
 
 
+def get_reminder_type_info(users_only=False):
+    type_info = ReminderType.query.all()
+
+    # Will return only types that the user has reminders for
+    if users_only:
+        new_type_info = []
+
+        # Gets the specific type ids from the reminders of the user
+        user_types = db.session.query(Reminder.type_id).filter(
+            Reminder.user_id == current_user.id
+        ).all()
+
+        user_types_ids = {t[0] for t in user_types}
+
+        # Only adds types that the user has in their reminders
+        for type in type_info:
+            if type.id in user_types_ids:
+                new_type_info.append(type)
+        type_info = new_type_info
+
+    return type_info
+
+
 # Gets users personal health info
 def get_user_health_entries():
     # Gets all users health info
@@ -491,3 +536,12 @@ def get_user_health_entries():
     ).all()
 
     return user_health_entries
+
+
+def get_user_reminders():
+    # Gets all users reminders
+    user_reminders = db.session.query(Reminder).filter(
+        Reminder.user_id == current_user.id
+    ).all()
+
+    return user_reminders

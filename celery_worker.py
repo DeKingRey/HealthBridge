@@ -1,6 +1,5 @@
 from celery import Celery
 from app import create_app
-from app.extensions import db, mail
 
 app = create_app()
 

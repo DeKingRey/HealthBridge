@@ -16,5 +16,5 @@ Follow these steps to initialize celery:
     docker ps
 
 4. Start celery worker with:
-    celery -A celery_worker worker --pool=solo --loglevel=info
+    celery -A celery_worker.celery worker --pool=solo --loglevel=info
 """

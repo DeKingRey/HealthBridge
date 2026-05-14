@@ -38,11 +38,11 @@
 </div>
 
 <!-- Dropdowns for each health category showing user their health info -->
-<div class="health-types">
+<div class="category-list">
     {% for type in types %}
-        <button onclick="accordionDropdown('health_section_{{ type.id }}')"
+        <button id="dropdown_{{ type.id }}" onclick="accordionDropdown('{{ type.id }}', '{{ type.name}}')"
         class="w3-button w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge">
-            {{ type.name }} ⌄
+            {{ type.name }} >
         </button>
         
         <!-- List of health infos under specific category -->
@@ -90,14 +90,17 @@
 <script src="static/js/modal.js"></script>
 <script>
     // Controls accordion content
-    function accordionDropdown(id) {
-        var section = document.getElementById(id);
+    function accordionDropdown(id, name) {
+        var section = document.getElementById("health_section_" + id);
+        var dropdown = document.getElementById("dropdown_" + id);
         
         // Checks whether section is currently open or not - then hides/shows accordingly
         if (section.className.indexOf("w3-show") == -1) {
             section.className += " w3-show";
+            dropdown.textContent = name + " ⌄"
         } else {
             section.className = section.className.replace(" w3-show", "");
+            dropdown.textContent = name + " >"
         }
     }
 </script>
