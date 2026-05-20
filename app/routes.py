@@ -16,7 +16,7 @@ from flask import (render_template, Blueprint, url_for,
 from flask_login import (login_required, login_user, logout_user,
                          current_user)
 from app.models import (User, Health, UserHealth, HealthType,
-                        Reminder, ReminderType)
+                        Reminder, ReminderType, Status)
 from app.forms import (RegisterForm, LoginForm, ResetPasswordForm,
                        AddHealthInfoForm, AddReminderForm)
 from app import db, bcrypt, login_manager, mail
@@ -25,7 +25,8 @@ from flask_mail import Message
 from weasyprint import HTML
 from email_validator import validate_email, EmailNotValidError
 from datetime import datetime, timedelta, timezone
-from config import (APPOINTMENT_ID, MEDICATION_ID)
+from config import (APPOINTMENT_ID, MEDICATION_ID,
+                    UPCOMING_ID, OVERDUE_ID, TAKEN_ID)
 import os
 
 main = Blueprint("main", __name__)
@@ -222,7 +223,9 @@ def reminders():
     types = get_reminder_type_info(True)
     user_reminders = get_user_reminders()
     return render_template("reminders.html", header="Reminders",
-                           types=types, user_reminders=user_reminders)
+                           types=types, user_reminders=user_reminders,
+                           upcoming_id=UPCOMING_ID, taken_id=TAKEN_ID,
+                           overdue_id=OVERDUE_ID)
 
 
 @main.route("/remove-reminder", methods=["GET", "POST"])
@@ -285,12 +288,23 @@ def add_reminder():
         db.session.add(reminder)
         db.session.commit()
 
-        # TEST - TEMPORARY REMMEBER TO DELETE
+        body = form.desc.data
+
+        # Includes link to track meds that have been taken
+        if reminder.type_id == MEDICATION_ID:
+            take_med_url = url_for(
+                "main.set_medicine_taken",
+                token=generate_verification_token(current_user.email),
+                med_id=reminder.id)
+            body = f"""{body} \n
+                        Tap here after taking your medicine: {take_med_url}"""
+
+        # Schedules reminder with celery
         send_reminder_email.apply_async(
             args=[
                 current_user.email,
                 form.name.data,
-                form.desc.data,
+                body,
                 reminder.id
             ],
             eta=scheduled_time
@@ -299,6 +313,19 @@ def add_reminder():
         return redirect(url_for("main.reminders"))
     return render_template("add-reminder.html", header="Add Reminder",
                            form=form)
+
+
+@main.route("/set-medicine-taken/<token>", methods=["GET", "POST"])
+def set_medicine_taken(token):
+    # Validates request checking that the token matches user generated one
+    email = confirm_verification_token(token)
+    if not email:
+        return redirect(url_for("main.login"))
+
+    med_id = request.args.get("med_id")
+    update_medication_status(med_id, TAKEN_ID)
+
+    return redirect(url_for("main.reminders"))
 
 
 @main.route("/login", methods=["GET", "POST"])
@@ -544,4 +571,16 @@ def get_user_reminders():
         Reminder.user_id == current_user.id
     ).all()
 
+    # Formats medication times into the 12 hour format
+    for reminder in user_reminders:
+        if reminder.type_id == MEDICATION_ID:
+            reminder.scheduled_time = reminder.scheduled_time.strftime(
+                "%I:%M %p").lstrip("0")
+
     return user_reminders
+
+
+def update_medication_status(med_id, status_id):
+    med_reminder = Reminder.query.get(med_id)
+    med_reminder.status = status_id
+    db.session.commit()

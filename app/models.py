@@ -64,3 +64,11 @@ class Reminder(db.Model):
     type_id = db.Column(db.Integer, db.ForeignKey("reminder_type.id"))
 
     scheduled_time = db.Column(db.DateTime, nullable=False)
+
+    status_id = db.Column(db.Integer, db.ForeignKey("status.id"))
+    status = db.relationship("Status", backref="reminders")
+
+
+class Status(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), nullable=False)

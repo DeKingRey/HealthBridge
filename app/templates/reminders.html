@@ -9,54 +9,78 @@
     </a>
 </div>
 
-<!-- Dropdowns for each reminder category showing user their reminders -->
-<div class="category-list">
-    {% for type in types %}
-        <button id="dropdown_{{ type.id }}" onclick="accordionDropdown('{{ type.id }}', '{{ type.name }}')"
-        class="w3-button w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge">
-            {{ type.name }}s >
-        </button>
-        
-        <!-- List of reminders under specific category -->
-        <ul id="reminder_section_{{ type.id }}" class="w3-container w3-hide w3-ul w3-card w3-large"
-        style="padding:0.5rem">
-            {% for reminder in user_reminders %}
-                {% if reminder.type_id == type.id %}
-                    <li class="w3-display-container">
-                        <button onclick="toggleModal('modal_{{ reminder.id }}')"
-                        class="w3-btn w3-circle error-colour w3-display-topright btn-hover-red">
-                            <i class="fa-regular fa-trash-can"></i>
-                        </button>
-                        <p><strong>{{ reminder.name }}</strong></p>
-                        <p>{{ reminder.desc }}</p>
-                    </li>
-                    
-                    <!-- Delete reminder popup -->
-                    <div id="modal_{{ reminder.id }}" class="w3-modal">
-                        <div class="w3-modal-content">
-                            <div class="w3-container">
-                                <p>Are you sure you want to delete: <strong>{{ reminder.name }}</strong>?</p>
-                                <span onclick="toggleModal('modal_{{ reminder.id }}')"
-                                class="w3-button">
-                                    Cancel
-                                </span>
-                                
-                                <form method="POST" action="/remove-reminder">
-                                    <input type="hidden" name="reminder_id" value="{{ reminder.id }}">
+<div class="w3-flex">
+    <!-- Dropdowns for each reminder category showing user their reminders -->
+    <div class="category-list w3-container" style="flex: 0.5">
+        {% for type in types %}
+            <button id="dropdown_{{ type.id }}" onclick="accordionDropdown('{{ type.id }}', '{{ type.name }}')"
+            class="w3-button w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge">
+                {{ type.name }}s >
+            </button>
+            
+            <!-- List of reminders under specific category -->
+            <ul id="reminder_section_{{ type.id }}" class="w3-container w3-hide w3-ul w3-card w3-large"
+            style="padding:0.5rem">
+                {% for reminder in user_reminders %}
+                    {% if reminder.type_id == type.id %}
+                        <li class="w3-display-container">
+                            <button onclick="toggleModal('modal_{{ reminder.id }}')"
+                            class="w3-btn w3-circle error-colour w3-display-topright btn-hover-red">
+                                <i class="fa-regular fa-trash-can"></i>
+                            </button>
+                            <p><strong>{{ reminder.name }}</strong></p>
+                            <p>{{ reminder.desc }}</p>
+                        </li>
+                        
+                        <!-- Delete reminder popup -->
+                        <div id="modal_{{ reminder.id }}" class="w3-modal">
+                            <div class="w3-modal-content">
+                                <div class="w3-container">
+                                    <p>Are you sure you want to delete: <strong>{{ reminder.name }}</strong>?</p>
+                                    <span onclick="toggleModal('modal_{{ reminder.id }}')"
+                                    class="w3-button">
+                                        Cancel
+                                    </span>
                                     
-                                    <button type="submit"
-                                            onclick="toggleModal('modal_{{ reminder.id }}')"
-                                            class="w3-btn w3-error-colour">
-                                        Confirm Delete
-                                    </button>
-                                </form>
+                                    <form method="POST" action="/remove-reminder">
+                                        <input type="hidden" name="reminder_id" value="{{ reminder.id }}">
+                                        
+                                        <button type="submit"
+                                                onclick="toggleModal('modal_{{ reminder.id }}')"
+                                                class="w3-btn w3-error-colour">
+                                            Confirm Delete
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+        {% endfor %}
+    </div>
+
+    <div class="w3-container" style="flex: 1">
+        <table class="w3-table-all">
+            <thead>Medication Tracker</thead>
+            <tr class="secondary-colour">
+                <th>Name</th>
+                <th>Time</th>
+                <th>Description</th>
+                <th>Status</th>
+            </tr>
+            {% for reminder in user_reminders %}
+                {% if reminder.type_id == 2 %} <!-- Medication id is 2 -->
+                    <tr>
+                        <td>{{ reminder.name }}</td>
+                        <td>{{ reminder.scheduled_time }}</td>
+                        <td>{{ reminder.description }}</td>
+                        <td>Status</td>
+                    </tr>
                 {% endif %}
             {% endfor %}
-            </ul>
-    {% endfor %}
+        </table>
+    </div>
 </div>
 
 <script src="static/js/modal.js"></script>

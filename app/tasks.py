@@ -13,7 +13,7 @@ def send_reminder_email(to, subject, body, reminder_id):
         recipients=[to],
         body=body
     )
-    print("EMAIL SENT")
+
     mail.send(msg)
 
     reminder = Reminder.query.get(reminder_id)
