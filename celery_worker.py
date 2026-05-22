@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.schedules import crontab
 from app import create_app
 
 app = create_app()
@@ -22,3 +23,11 @@ class ContextClass(celery.Task):
 
 
 celery.Task = ContextClass
+
+# Schedules med reminders to reset to upcoming at midnight
+celery.conf.beat_schedule = {
+    "reset-meds-midnight": {
+        "task": "app.tasks.reset_medication_statuses",
+        "schedule": crontab(hour=0, minute=0),
+    },
+}

@@ -28,6 +28,7 @@ from datetime import datetime, timedelta, timezone
 from config import (APPOINTMENT_ID, MEDICATION_ID,
                     UPCOMING_ID, OVERDUE_ID, TAKEN_ID)
 import os
+import math
 
 main = Blueprint("main", __name__)
 serializer = URLSafeTimedSerializer(os.getenv("SECRET_KEY"))
@@ -260,6 +261,7 @@ def add_reminder():
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
         local_tz = datetime.now().astimezone().tzinfo
+        status_id = None
 
         # Appointment Reminder
         if form.type_id.data == APPOINTMENT_ID:
@@ -271,6 +273,7 @@ def add_reminder():
         # Medication Reminder
         elif form.type_id.data == MEDICATION_ID:
             med_time = form.medication_time.data
+            status_id = UPCOMING_ID
             scheduled_time = datetime.combine(datetime.today().date(),
                                               med_time, tzinfo=local_tz)
             # Converts to UTC for scheduling
@@ -279,12 +282,14 @@ def add_reminder():
             # Schedules for tomorrow if time has already passed
             if scheduled_time < datetime.now(timezone.utc):
                 scheduled_time += timedelta(days=1)
+                status_id = TAKEN_ID
 
         reminder = Reminder(user_id=current_user.id,
                             name=form.name.data,
                             description=form.desc.data,
                             type_id=form.type_id.data,
-                            scheduled_time=scheduled_time)
+                            scheduled_time=scheduled_time,
+                            status_id=status_id)
         db.session.add(reminder)
         db.session.commit()
 
@@ -295,7 +300,8 @@ def add_reminder():
             take_med_url = url_for(
                 "main.set_medicine_taken",
                 token=generate_verification_token(current_user.email),
-                med_id=reminder.id)
+                med_id=reminder.id,
+                _external=True)
             body = f"""{body} \n
                         Tap here after taking your medicine: {take_med_url}"""
 
@@ -571,16 +577,20 @@ def get_user_reminders():
         Reminder.user_id == current_user.id
     ).all()
 
-    # Formats medication times into the 12 hour format
+    # Formats medication times into the 12 hour format for display
     for reminder in user_reminders:
         if reminder.type_id == MEDICATION_ID:
-            reminder.scheduled_time = reminder.scheduled_time.strftime(
+            reminder.display_time = reminder.scheduled_time.strftime(
                 "%I:%M %p").lstrip("0")
+
+    # Sorts by status OVERDUE->UPCOMING->TAKEN->NONE to order in tracker
+    user_reminders.sort(
+        key=lambda x: x.status_id if x.status_id is not None else math.inf)
 
     return user_reminders
 
 
 def update_medication_status(med_id, status_id):
     med_reminder = Reminder.query.get(med_id)
-    med_reminder.status = status_id
+    med_reminder.status_id = status_id
     db.session.commit()

@@ -73,9 +73,9 @@
                 {% if reminder.type_id == 2 %} <!-- Medication id is 2 -->
                     <tr>
                         <td>{{ reminder.name }}</td>
-                        <td>{{ reminder.scheduled_time }}</td>
+                        <td>{{ reminder.display_time }}</td>
                         <td>{{ reminder.description }}</td>
-                        <td>Status</td>
+                        <td>{{ reminder.status.name }}</td>
                     </tr>
                 {% endif %}
             {% endfor %}
