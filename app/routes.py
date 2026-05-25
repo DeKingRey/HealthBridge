@@ -585,7 +585,11 @@ def get_user_reminders():
 
     # Sorts by status OVERDUE->UPCOMING->TAKEN->NONE to order in tracker
     user_reminders.sort(
-        key=lambda x: x.status_id if x.status_id is not None else math.inf)
+        key=lambda x: (
+            x.status_id if x.status_id is not None else math.inf,
+            x.scheduled_time
+        )
+    )
 
     return user_reminders
 

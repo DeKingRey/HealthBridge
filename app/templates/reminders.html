@@ -71,7 +71,7 @@
             </tr>
             {% for reminder in user_reminders %}
                 {% if reminder.type_id == 2 %} <!-- Medication id is 2 -->
-                    <tr>
+                    <tr id="med_status_{{ reminder.id }}" onload="colourStatus('{{ reminder.id }}', '{{ reminder.status_id }}')">
                         <td>{{ reminder.name }}</td>
                         <td>{{ reminder.display_time }}</td>
                         <td>{{ reminder.description }}</td>
@@ -97,6 +97,21 @@
         } else {
             section.className = section.className.replace(" w3-show", "");
             dropdown.textContent = name + "s >"
+        }
+    }
+</script>
+
+<script>
+    const OVERDUE_ID = {{ overdue_id|tojson }};
+    const UPCOMING_ID = {{ upcoming_id|tojson }};
+    const TAKEN_ID = {{ taken_id|tojson }};
+
+    function colourStatus(id, status_id) {
+        var row = document.getElementById("med_status_" + id)
+
+        if (status_id == UPCOMING_ID) {
+            // Add hue or a value to the current colour to make it the desired colour
+            // This ensures that the shades will be differentiable
         }
     }
 </script>
