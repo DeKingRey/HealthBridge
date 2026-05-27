@@ -136,3 +136,13 @@ footer {
 
     gap: 1rem;
 }
+
+
+/* Table row overrides colours to hsl values for easier modification */ 
+.w3-table-all tr:nth-child(even) {
+    background-color: rgb(242, 242, 242);
+}
+
+.w3-table-all tr:nth-child(odd) {
+    background-color: rgb(255, 255, 255);
+}

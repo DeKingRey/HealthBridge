@@ -71,7 +71,7 @@
             </tr>
             {% for reminder in user_reminders %}
                 {% if reminder.type_id == 2 %} <!-- Medication id is 2 -->
-                    <tr id="med_status_{{ reminder.id }}" onload="colourStatus('{{ reminder.id }}', '{{ reminder.status_id }}')">
+                    <tr id="med_status_{{ reminder.id }}" data-status-id="{{ reminder.status.id }}">
                         <td>{{ reminder.name }}</td>
                         <td>{{ reminder.display_time }}</td>
                         <td>{{ reminder.description }}</td>
@@ -102,17 +102,67 @@
 </script>
 
 <script>
+    // Runs the colour status function on all rows when content is loaded
+    document.addEventListener("DOMContentLoaded", () => {
+        // Finds all rows that begin with 'med_status_'
+        document.querySelectorAll("tr[id^='med_status_']").forEach(row => {
+            const reminderId = row.id.replace("med_status_", ""); // Only gives id
+            const statusId = row.dataset.statusId;
+
+            console.log(statusId);
+
+            colourStatus(reminderId, statusId);
+        });
+    });
+
     const OVERDUE_ID = {{ overdue_id|tojson }};
     const UPCOMING_ID = {{ upcoming_id|tojson }};
     const TAKEN_ID = {{ taken_id|tojson }};
 
-    function colourStatus(id, status_id) {
-        var row = document.getElementById("med_status_" + id)
+    // Changes hues of rows based on status
+    // Ensures rows remain striped so they are easy to distinguish by adding hue to pre-existing colour
+    function colourStatus(id, statusId) {
+        var row = document.getElementById("med_status_" + id);
+        if (!row) return;
 
-        if (status_id == UPCOMING_ID) {
-            // Add hue or a value to the current colour to make it the desired colour
-            // This ensures that the shades will be differentiable
+        // Gets base HSL value
+        let base = getRowBaseColour(row);
+        
+        // Extracts HSL values
+        const match = base.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+        if (!match) return;
+
+        let r = parseInt(match[0]);
+        let g = parseInt(match[1]);
+        let b = parseInt(match[2]);
+
+        console.log(base);
+        console.log(statusId);
+        
+        // Adds hue to current hue
+        if (statusId == OVERDUE_ID) {
+            console.log(r);
+            r -= 32;
+            g -= 96;
+            b -= 96;
+        } 
+        else if (statusId == UPCOMING_ID) {
+            r += 50;
+            g += 50;
+            b -= 25;
         }
+        else if (statusId == TAKEN_ID) {
+            r += 130;
+            g += 50;
+            b -= 25;
+        }
+
+        row.style.backgroundColor = `rgb(${r}, ${g}, ${b})`
+    }
+
+    function getRowBaseColour(row) {
+        const style = getComputedStyle(row);
+        return style.getPropertyValue("background-color");
     }
 </script>
 
