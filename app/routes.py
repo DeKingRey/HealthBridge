@@ -12,11 +12,12 @@ Date: 27-02-2026
 """
 
 from flask import (render_template, Blueprint, url_for,
-                   redirect, request, make_response)
+                   redirect, request, make_response,
+                   current_app)
 from flask_login import (login_required, login_user, logout_user,
                          current_user)
 from app.models import (User, Health, UserHealth, HealthType,
-                        Reminder, ReminderType, Status)
+                        Reminder, ReminderType)
 from app.forms import (RegisterForm, LoginForm, ResetPasswordForm,
                        AddHealthInfoForm, AddReminderForm)
 from app import db, bcrypt, login_manager, mail
@@ -353,12 +354,17 @@ def login():
                 else:
                     subject, body = register_email_info(user.email,
                                                         remember_flag)
-                    send_email(user.email, subject, body)
+                    success = send_email(user.email, subject, body)
 
-                    message = "Please check your emails to verify your account"
+                    if success:
+                        message = """
+                        Please check your emails to verify your account"""
+                    else:
+                        message = "Email failed to send - try again"
                     return render_template("email-sent.html",
                                            header="Please verify your email",
-                                           message=message, email_failed=False)
+                                           message=message,
+                                           email_failed=success)
             else:
                 form.password.errors.append("Password is incorrect")
     return render_template("login.html", header="Login",
@@ -393,12 +399,16 @@ def register():
 
         # Sends verification email
         subject, body = register_email_info(form.email.data, remember_flag)
-        send_email(form.email.data, subject, body)
+        success = send_email(form.email.data, subject, body)
 
-        message = "Please check your emails to verify your account"
+        if success:
+            message = """
+            Please check your emails to verify your account"""
+        else:
+            message = "Email failed to send - try again"
         return render_template("email-sent.html",
                                header="Please verify your email",
-                               message=message, email_failed=False)
+                               message=message, email_failed=success)
     return render_template("register.html", header="Register",
                            form=form)
 
@@ -420,15 +430,20 @@ def reset_password_request():
                 _external=True
             )
 
-            send_email(
+            success = send_email(
                 user.email,
                 "Reset Password Request",
                 f"Click to reset: {reset_url}"
             )
-        message = "Please check your emails to reset your password"
+
+        if success:
+            message = """
+            Please check your emails to reset your password"""
+        else:
+            message = "Email failed to send - try again"
         return render_template("email-sent.html",
                                header="Reset Password",
-                               message=message, email_failed=False)
+                               message=message, email_failed=success)
     return render_template("reset-password.html", form=form,
                            email_verified=False)
 
@@ -491,8 +506,12 @@ def send_email(email, subject, body, attachments=None):
     if attachments:
         for attachment in attachments:
             msg.attach(*attachment)
-
-    mail.send(msg)
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        current_app.logger.error(f"MAIL ERROR: {e}")
+        return False
 
 
 def register_email_info(email, remember_flag):

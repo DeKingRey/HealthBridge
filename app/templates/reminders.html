@@ -61,14 +61,16 @@
     </div>
 
     <div class="w3-container" style="flex: 1">
+        <h2>Medication Tracker</h2>
         <table class="w3-table-all">
-            <thead>Medication Tracker</thead>
-            <tr class="secondary-colour">
-                <th>Name</th>
-                <th>Time</th>
-                <th>Description</th>
-                <th>Status</th>
-            </tr>
+            <thead class="w3-border-black w3-xlarge" style="border: 0.2rem solid black;">
+                <tr class="secondary-colour w3-border">
+                    <th>Name</th>
+                    <th>Time</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
             {% for reminder in user_reminders %}
                 {% if reminder.type_id == 2 %} <!-- Medication id is 2 -->
                     <tr id="med_status_{{ reminder.id }}" data-status-id="{{ reminder.status.id }}">
@@ -109,8 +111,6 @@
             const reminderId = row.id.replace("med_status_", ""); // Only gives id
             const statusId = row.dataset.statusId;
 
-            console.log(statusId);
-
             colourStatus(reminderId, statusId);
         });
     });
@@ -132,29 +132,27 @@
         const match = base.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
         if (!match) return;
 
-        let r = parseInt(match[0]);
-        let g = parseInt(match[1]);
-        let b = parseInt(match[2]);
+        console.log(match);
 
-        console.log(base);
-        console.log(statusId);
+        let r = parseInt(match[1]);
+        let g = parseInt(match[2]);
+        let b = parseInt(match[3]);
         
         // Adds hue to current hue
         if (statusId == OVERDUE_ID) {
-            console.log(r);
-            r -= 32;
-            g -= 96;
-            b -= 96;
+            r -= 8;
+            g -= 107;
+            b -= 107;
         } 
         else if (statusId == UPCOMING_ID) {
-            r += 50;
-            g += 50;
-            b -= 25;
+            r -= 8;
+            g -= 14;
+            b -= 82;
         }
         else if (statusId == TAKEN_ID) {
-            r += 130;
-            g += 50;
-            b -= 25;
+            r -= 68;
+            g -= 8;
+            b -= 82;
         }
 
         row.style.backgroundColor = `rgb(${r}, ${g}, ${b})`
