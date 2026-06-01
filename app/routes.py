@@ -196,8 +196,9 @@ def download_health_pdf():
 
     response = make_response(pdf)
     response.headers["Content-Type"] = "application/pdf"
-    response.headers["Content-Disposition"] = """attachment;
-                                                filename=patient_summary.pdf"""
+    response.headers["Content-Disposition"] = (
+            "attachment; filename=patient_summary.pdf"
+    )
 
     return response
 
@@ -596,11 +597,18 @@ def get_user_reminders():
         Reminder.user_id == current_user.id
     ).all()
 
-    # Formats medication times into the 12 hour format for display
+    # Formats times into the 12 hour format for display
+    local_tz = datetime.now().astimezone().tzinfo  # Displays in local time
     for reminder in user_reminders:
+        display_time = reminder.scheduled_time.astimezone(local_tz)
+
         if reminder.type_id == MEDICATION_ID:
-            reminder.display_time = reminder.scheduled_time.strftime(
+            reminder.display_time = display_time.strftime(
                 "%I:%M %p").lstrip("0")
+        else:
+            # Appointments include dates
+            reminder.display_time = display_time.strftime(
+                "%d-%m-%Y %#I:%M %p")
 
     # Sorts by status OVERDUE->UPCOMING->TAKEN->NONE to order in tracker
     user_reminders.sort(
