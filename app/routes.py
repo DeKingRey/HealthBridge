@@ -28,6 +28,7 @@ from email_validator import validate_email, EmailNotValidError
 from datetime import datetime, timedelta, timezone
 from config import (APPOINTMENT_ID, MEDICATION_ID,
                     UPCOMING_ID, OVERDUE_ID, TAKEN_ID)
+from zoneinfo import ZoneInfo
 import os
 import math
 
@@ -262,13 +263,13 @@ def add_reminder():
 
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
-        local_tz = datetime.now().astimezone().tzinfo
+        nz_tz = ZoneInfo("Pacific/Auckland")  # App uses NZ timezone
         status_id = None
 
         # Appointment Reminder
         if form.type_id.data == APPOINTMENT_ID:
             scheduled_time = form.appointment_datetime.data.replace(
-                tzinfo=local_tz)
+                tzinfo=nz_tz)
             # Converts to UTC for scheduling
             scheduled_time = scheduled_time.astimezone(timezone.utc)
 
@@ -277,14 +278,15 @@ def add_reminder():
             med_time = form.medication_time.data
             status_id = UPCOMING_ID
             scheduled_time = datetime.combine(datetime.today().date(),
-                                              med_time, tzinfo=local_tz)
-            # Converts to UTC for scheduling
-            scheduled_time = scheduled_time.astimezone(timezone.utc)
+                                              med_time, tzinfo=nz_tz)
 
             # Schedules for tomorrow if time has already passed
-            if scheduled_time < datetime.now(timezone.utc):
+            if scheduled_time < datetime.now(nz_tz):
                 scheduled_time += timedelta(days=1)
-                status_id = TAKEN_ID
+                status_id = TAKEN_ID  # Assuming user has already taken meds
+
+            # Converts to UTC for scheduling
+            scheduled_time = scheduled_time.astimezone(timezone.utc)
 
         reminder = Reminder(user_id=current_user.id,
                             name=form.name.data,
@@ -598,9 +600,9 @@ def get_user_reminders():
     ).all()
 
     # Formats times into the 12 hour format for display
-    local_tz = datetime.now().astimezone().tzinfo  # Displays in local time
+    nz_tz = ZoneInfo("Pacific/Auckland")  # Displays in nz time
     for reminder in user_reminders:
-        display_time = reminder.scheduled_time.astimezone(local_tz)
+        display_time = reminder.scheduled_time.astimezone(nz_tz)
 
         if reminder.type_id == MEDICATION_ID:
             reminder.display_time = display_time.strftime(

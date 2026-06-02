@@ -11,7 +11,8 @@ celery = Celery(
                 include=["app.tasks"]
                 )
 
-celery.conf.timezone = "UTC"
+# App is NZ only
+celery.conf.timezone = "Pacific/Auckland"
 celery.conf.enable_utc = True
 
 

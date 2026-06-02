@@ -4,7 +4,8 @@ from celery_worker import celery
 from config import (APPOINTMENT_ID, MEDICATION_ID, UPCOMING_ID,
                     OVERDUE_ID)
 from app.models import Reminder
-from datetime import timedelta
+from datetime import timedelta, timezone
+from zoneinfo import ZoneInfo
 
 
 @celery.task
@@ -24,8 +25,13 @@ def send_reminder_email(to, subject, body, reminder_id):
     elif reminder.type_id == MEDICATION_ID:
         # Sets to overdue until taken
         reminder.status_id = OVERDUE_ID
-        # Sets schduled time to next day
-        reminder.scheduled_time += timedelta(days=1)
+
+        # Sets scheduled time to next day and prevents DST errors
+        nz_tz = ZoneInfo("Pacific/Auckland")
+        current_nz = (reminder.scheduled_time.replace(tzinfo=timezone.utc).
+                      astimezone(nz_tz))
+        next_nz = current_nz + timedelta(days=1)
+        reminder.scheduled_time = next_nz.astimezone(timezone.utc)
     db.session.commit()
 
 

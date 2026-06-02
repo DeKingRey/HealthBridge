@@ -162,3 +162,7 @@ class AddReminderForm(FlaskForm):
             raise ValidationError(
                 "Type ID is invalid"
             )
+    
+
+    def validate_appointment_datetime(self, appointment_datetime):
+        
