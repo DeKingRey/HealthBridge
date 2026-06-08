@@ -277,8 +277,11 @@ def add_reminder():
         elif form.type_id.data == MEDICATION_ID:
             med_time = form.medication_time.data
             status_id = UPCOMING_ID
-            scheduled_time = datetime.combine(datetime.today().date(),
-                                              med_time, tzinfo=nz_tz)
+
+            # First combines date then converts to nz time
+            naive_combined = datetime.combine(datetime.now(nz_tz).date(),
+                                              med_time)
+            scheduled_time = naive_combined.replace(tzinfo=nz_tz)
 
             # Schedules for tomorrow if time has already passed
             if scheduled_time < datetime.now(nz_tz):
@@ -602,7 +605,13 @@ def get_user_reminders():
     # Formats times into the 12 hour format for display
     nz_tz = ZoneInfo("Pacific/Auckland")  # Displays in nz time
     for reminder in user_reminders:
-        display_time = reminder.scheduled_time.astimezone(nz_tz)
+        # First ensures that there is an attached timezone
+        utc_time = reminder.scheduled_time
+        if reminder.scheduled_time.tzinfo is None:
+            utc_time = reminder.scheduled_time.replace(tzinfo=timezone.utc)
+
+        # Converts from UTC to NZT
+        display_time = utc_time.astimezone(nz_tz)
 
         if reminder.type_id == MEDICATION_ID:
             reminder.display_time = display_time.strftime(
@@ -610,7 +619,7 @@ def get_user_reminders():
         else:
             # Appointments include dates
             reminder.display_time = display_time.strftime(
-                "%d-%m-%Y %#I:%M %p")
+                "%d-%m-%Y %I:%M %p")
 
     # Sorts by status OVERDUE->UPCOMING->TAKEN->NONE to order in tracker
     user_reminders.sort(

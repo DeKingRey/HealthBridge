@@ -11,6 +11,8 @@ from config import (MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH,
                     MIN_EMAIL_LENGTH, MAX_EMAIL_LENGTH,
                     MIN_REMINDER_LENGTH, MAX_REMINDER_LENGTH)
 from . models import User
+from zoneinfo import ZoneInfo
+from datetime import datetime
 
 
 class RegisterForm(FlaskForm):
@@ -162,7 +164,13 @@ class AddReminderForm(FlaskForm):
             raise ValidationError(
                 "Type ID is invalid"
             )
-    
 
+    # Ensures that the appointment datetime is not in the past
     def validate_appointment_datetime(self, appointment_datetime):
-        
+        if appointment_datetime.data:
+            nz_tz = ZoneInfo("Pacific/Auckland")
+            scheduled_time = appointment_datetime.data.replace(tzinfo=nz_tz)
+            if scheduled_time < datetime.now(nz_tz):
+                raise ValidationError(
+                    "Date has already passed"
+                )
