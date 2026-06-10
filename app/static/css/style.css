@@ -47,21 +47,27 @@
 html, body {
     height: 100%;
     margin: 0;
+    font-size: 18px;
 }
 
 body {
     display: flex;
     flex-direction: column;
+    font-size: 1.1rem;
+    line-height: 1.7;
 }
 
 main {
     flex: 1;
     margin: 1rem 1rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
 }
 
 header {
     font-size: 3rem;
     font-weight: 600;
+    margin: 1rem;
 }
 
 a {
@@ -145,4 +151,19 @@ footer {
 
 .w3-table-all tr:nth-child(odd) {
     background-color: rgb(255, 255, 255);
+}
+
+@media (max-width: 768px) {
+    .mobile-nav {
+        display: block;
+    }   
+
+    .computer-nav {
+        display: none;
+    }
+
+    .w3-table-all {
+        display: block;
+        overflow-x: auto;
+    }
 }

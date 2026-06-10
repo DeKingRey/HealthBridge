@@ -373,6 +373,8 @@ def login():
                                            email_failed=success)
             else:
                 form.password.errors.append("Password is incorrect")
+        else:
+            form.password.errors.append("No account for this email")
     return render_template("login.html", header="Login",
                            form=form)
 

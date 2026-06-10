@@ -12,7 +12,7 @@ Follow these steps to initialize celery:
 2. Create redis container with:
     docker run -p 6379:6379 redis
 
-3. Verify docker is working with:2
+3. Verify docker is working with:
     docker ps
 
 4. Start celery worker with:

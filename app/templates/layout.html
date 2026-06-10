@@ -11,7 +11,53 @@
 <body class="theme">
     <!-- Navbar -->
     <nav class="w3-bar primary-colour w3-xxlarge">
+        <button id="openNav" class="mobile-nav w3-bar-item btn-hover-colour w3-mobile w3-btn" onclick="openNav()"
+        style="display: none;">
+            &#9776;
+        </button>
         <div class="w3-bar-item w3-left white-text-colour w3-mobile">HealthBridge</div>
+
+        <div class="computer-nav primary-colour" style="width: 100%; height: 100%">
+            <a href="/" class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/' %}accent-colour{% endif %}">
+                Home
+            </a>
+
+            <!-- Shows register/login if not logged in, dashboard otherwise -->
+            {% if current_user.is_authenticated %}
+                <a href="/dashboard"
+                class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/dashboard' %}accent-colour{% endif %}">
+                    Dashboard
+                </a>
+                <a href="/health-info"
+                class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/health-info' %}accent-colour{% endif %}">
+                    Health Info
+                </a>
+                <a href="/reminders"
+                class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/reminders' %}accent-colour{% endif %}">
+                    Reminders
+                </a>
+            {% endif %}
+
+            <!-- Navbar Buttons -->
+            {% if not current_user.is_authenticated %}
+                <div class="w3-right nav-btns">
+                    <a href="/login" class="w3-btn w3-bar-item w3-round-xlarge btn-hover-colour accent-colour w3-mobile">
+                        Login
+                    </a>
+                    <a href="/register" class="w3-btn w3-bar-item w3-round-xlarge btn-hover-colour accent-colour w3-mobile">
+                        Register
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Mobile Nav-sidebar -->
+    <div class="w3-sidebar w3-bar-block w3-card w3-animate-left" style="display: none;" id="sidenav">
+        <a href="javascript:void(0)" class="w3-bar-item btn-hover-colour w3-mobile w3-large" onclick="closeNav()">
+            Close &times;
+        </a>
+        
         <a href="/" class="w3-bar-item btn-hover-colour w3-mobile {% if request.path == '/' %}accent-colour{% endif %}">
             Home
         </a>
@@ -34,7 +80,7 @@
 
         <!-- Navbar Buttons -->
         {% if not current_user.is_authenticated %}
-            <div class="w3-right nav-btns">
+            <div>
                 <a href="/login" class="w3-btn w3-bar-item w3-round-xlarge btn-hover-colour accent-colour w3-mobile">
                     Login
                 </a>
@@ -43,12 +89,32 @@
                 </a>
             </div>
         {% endif %}
-    </nav>
+    </div>
 
     <header>{{ header }}</header>
 
-    <main>{% block content %}{% endblock %}</main>
+    <main id="main">{% block content %}{% endblock %}</main>
     
     <footer class="w3-bar black-container">&copy;Miguel Monreal 2026</footer>
+
+    <script>
+        function openNav() {
+            if (window.innerWidth < 768) {
+                document.getElementById("main").style.marginLeft = "0";
+                document.getElementById("sidenav").style.width = "80%";
+            } else {
+                document.getElementById("main").style.marginLeft = "300px";
+                document.getElementById("sidenav").style.width = "300px";
+            }
+            document.getElementById("sidenav").style.display = "block";
+            document.getElementById("openNav").style.display = "none";
+        }
+
+        function closeNav() {
+            document.getElementById("main").style.marginLeft = "0";
+            document.getElementById("sidenav").style.display = "none";
+            document.getElementById("openNav").style.display = "inline-block";
+        }
+    </script>
 </body>
 </html>
