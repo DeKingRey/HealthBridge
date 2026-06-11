@@ -81,10 +81,10 @@
         <!-- Navbar Buttons -->
         {% if not current_user.is_authenticated %}
             <div>
-                <a href="/login" class="w3-btn w3-bar-item w3-round-xlarge btn-hover-colour accent-colour w3-mobile">
+                <a href="/login" class="w3-btn w3-bar-item btn-hover-colour w3-mobile">
                     Login
                 </a>
-                <a href="/register" class="w3-btn w3-bar-item w3-round-xlarge btn-hover-colour accent-colour w3-mobile">
+                <a href="/register" class="w3-btn w3-bar-item btn-hover-colour w3-mobile">
                     Register
                 </a>
             </div>
@@ -111,7 +111,7 @@
         }
 
         function closeNav() {
-            document.getElementById("main").style.marginLeft = "0";
+            document.getElementById("main").style.marginLeft = "1rem";
             document.getElementById("sidenav").style.display = "none";
             document.getElementById("openNav").style.display = "inline-block";
         }

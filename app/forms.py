@@ -137,7 +137,8 @@ class AddReminderForm(FlaskForm):
 
     desc = TextAreaField("Description", validators=[
         InputRequired(),
-        Length(min=MIN_DESC_LENGTH, max=MAX_DESC_LENGTH)],
+        Length(min=MIN_DESC_LENGTH, max=MAX_DESC_LENGTH),
+        Optional()],
         render_kw={"placeholder": "Description"}
     )
 

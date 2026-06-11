@@ -46,8 +46,7 @@
         </button>
         
         <!-- List of health infos under specific category -->
-        <ul id="health_section_{{ type.id }}" class="w3-container w3-hide w3-ul w3-card w3-large"
-        style="padding:0.5rem">
+        <ul id="health_section_{{ type.id }}" class="w3-container w3-ul w3-card w3-large accordion-content">
             {% for entry in user_health_entries %}
                 {% if entry.health.type_id == type.id %}
                     <li class="w3-display-container">
@@ -95,12 +94,12 @@
         var dropdown = document.getElementById("dropdown_" + id);
         
         // Checks whether section is currently open or not - then hides/shows accordingly
-        if (section.className.indexOf("w3-show") == -1) {
-            section.className += " w3-show";
-            dropdown.textContent = name + " ⌄"
+        if (section.style.height && section.style.height !== "0px") {
+            section.style.height = "0px";
+            dropdown.textContent = name + "s ⌄";
         } else {
-            section.className = section.className.replace(" w3-show", "");
-            dropdown.textContent = name + " >"
+            section.style.height = section.scrollHeight + "px";
+            dropdown.textContent = name + "s >";
         }
     }
 </script>
