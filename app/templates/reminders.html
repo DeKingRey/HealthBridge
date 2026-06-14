@@ -14,9 +14,9 @@
     <div class="category-list w3-container" style="flex: 0.5">
         {% for type in types %}
             <button id="dropdown_{{ type.id }}" onclick="accordionDropdown('{{ type.id }}', '{{ type.name }}')"
-            class="w3-button w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge">
+            class="w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge category-button">
                 {{ type.name }}s 
-                <span id="arrow_{{ type.id }}" class="arrow">></span>
+                <span id="arrow_{{ type.id }}" class="arrow">❯</span>
             </button>
             
             <!-- List of reminders under specific category -->
@@ -61,10 +61,10 @@
         {% endfor %}
     </div>
 
-    <div class="w3-container" style="flex: 1">
+    <div class="w3-container tracker-card" style="flex: 1">
         <h2>Medication Tracker</h2>
         <table class="w3-table-all">
-            <thead class="w3-border-black w3-xlarge" style="border: 0.2rem solid black;">
+            <thead class="w3-xlarge">
                 <tr class="secondary-colour w3-border">
                     <th>Name</th>
                     <th>Time</th>
@@ -78,7 +78,11 @@
                         <td>{{ reminder.name }}</td>
                         <td>{{ reminder.display_time }}</td>
                         <td>{{ reminder.description }}</td>
-                        <td>{{ reminder.status.name }}</td>
+                        <td>
+                            <span class="status-badge status-{{ reminder.status.name }}">
+                                {{ reminder.status.name }}
+                            </span>
+                        </td>
                     </tr>
                 {% endif %}
             {% endfor %}
@@ -92,78 +96,18 @@
     function accordionDropdown(id, name) {
         var section = document.getElementById("reminder_section_" + id);
         var dropdown = document.getElementById("dropdown_" + id);
-        var arrow = document.getElementsById("arrow_" + id);
+        var arrow = document.getElementById("arrow_" + id);
 
         arrow.classList.toggle("rotate");
         
         // Checks whether section is currently open or not - then hides/shows accordingly
         if (section.style.height && section.style.height !== "0px") {
             section.style.height = "0px";
+            section.style.opacity = "0";
         } else {
             section.style.height = section.scrollHeight + "px";
+            section.style.opacity = "1";
         }
     }
 </script>
-
-<script>
-    // Runs the colour status function on all rows when content is loaded
-    document.addEventListener("DOMContentLoaded", () => {
-        // Finds all rows that begin with 'med_status_'
-        document.querySelectorAll("tr[id^='med_status_']").forEach(row => {
-            const reminderId = row.id.replace("med_status_", ""); // Only gives id
-            const statusId = row.dataset.statusId;
-
-            colourStatus(reminderId, statusId);
-        });
-    });
-
-    const OVERDUE_ID = {{ overdue_id|tojson }};
-    const UPCOMING_ID = {{ upcoming_id|tojson }};
-    const TAKEN_ID = {{ taken_id|tojson }};
-
-    // Changes hues of rows based on status
-    // Ensures rows remain striped so they are easy to distinguish by adding hue to pre-existing colour
-    function colourStatus(id, statusId) {
-        var row = document.getElementById("med_status_" + id);
-        if (!row) return;
-
-        // Gets base HSL value
-        let base = getRowBaseColour(row);
-        
-        // Extracts HSL values
-        const match = base.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-        if (!match) return;
-
-        console.log(match);
-
-        let r = parseInt(match[1]);
-        let g = parseInt(match[2]);
-        let b = parseInt(match[3]);
-        
-        // Adds hue to current hue
-        if (statusId == OVERDUE_ID) {
-            r -= 8;
-            g -= 107;
-            b -= 107;
-        } 
-        else if (statusId == UPCOMING_ID) {
-            r -= 8;
-            g -= 14;
-            b -= 82;
-        }
-        else if (statusId == TAKEN_ID) {
-            r -= 68;
-            g -= 8;
-            b -= 82;
-        }
-
-        row.style.backgroundColor = `rgb(${r}, ${g}, ${b})`
-    }
-
-    function getRowBaseColour(row) {
-        const style = getComputedStyle(row);
-        return style.getPropertyValue("background-color");
-    }
-</script>
-
 {% endblock %}

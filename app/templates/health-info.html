@@ -41,8 +41,9 @@
 <div class="category-list">
     {% for type in types %}
         <button id="dropdown_{{ type.id }}" onclick="accordionDropdown('{{ type.id }}', '{{ type.name}}')"
-        class="w3-button w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge">
-            {{ type.name }} >
+        class="w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge category-button">
+            {{ type.name }}
+            <span id="arrow_{{ type.id }}" class="arrow">❯</span>
         </button>
         
         <!-- List of health infos under specific category -->
@@ -92,14 +93,17 @@
     function accordionDropdown(id, name) {
         var section = document.getElementById("health_section_" + id);
         var dropdown = document.getElementById("dropdown_" + id);
+        var arrow = document.getElementById("arrow_" + id);
+
+        arrow.classList.toggle("rotate");
         
         // Checks whether section is currently open or not - then hides/shows accordingly
         if (section.style.height && section.style.height !== "0px") {
             section.style.height = "0px";
-            dropdown.textContent = name + "s ⌄";
+            section.style.opacity = "0";
         } else {
             section.style.height = section.scrollHeight + "px";
-            dropdown.textContent = name + "s >";
+            section.style.opacity = "1";
         }
     }
 </script>
