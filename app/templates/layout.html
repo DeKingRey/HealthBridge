@@ -91,9 +91,12 @@
         {% endif %}
     </div>
 
-    <header>{{ header }}</header>
-
-    <main id="main">{% block content %}{% endblock %}</main>
+    <main id="main">
+        <header>{{ header }}</header>
+        <div class="divider"></div>
+        {% block content %}
+        {% endblock %}
+    </main>
     
     <footer class="w3-bar black-container">&copy;Miguel Monreal 2026</footer>
 

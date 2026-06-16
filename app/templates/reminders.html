@@ -1,7 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<p>Add your reminders for medicine or schedule appointments here</p>
+<p style="text-align: center;">
+    Here you can add reminders for daily medication or upcoming appointments.<br><br>
+    The medication tracking table can help you to keep track of the medicine you have taken for the day, and whether you have forgotten to take any.
+</p>
 
 <div class="btns">
     <a href="/add-reminder" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
@@ -11,7 +14,7 @@
 
 <div class="w3-flex">
     <!-- Dropdowns for each reminder category showing user their reminders -->
-    <div class="category-list w3-container" style="flex: 0.5">
+    <div class="reminder-list w3-container" style="flex: 0.5">
         {% for type in types %}
             <button id="dropdown_{{ type.id }}" onclick="accordionDropdown('{{ type.id }}', '{{ type.name }}')"
             class="w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge category-button">
@@ -28,8 +31,8 @@
                             class="w3-btn w3-circle error-colour w3-display-topright btn-hover-red">
                                 <i class="fa-regular fa-trash-can"></i>
                             </button>
-                            <p><strong>{{ reminder.name }}</strong></p>
-                            <p><i>{{ reminder.display_time }}</i></p>
+                            <h4><strong>{{ reminder.name }}</strong></h4>
+                            <p class="reminder-time">{{ reminder.display_time }}</p>
                             <p>{{ reminder.description }}</p>
                         </li>
                         

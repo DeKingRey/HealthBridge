@@ -38,51 +38,53 @@
 </div>
 
 <!-- Dropdowns for each health category showing user their health info -->
-<div class="category-list">
+<div class="health-list">
     {% for type in types %}
-        <button id="dropdown_{{ type.id }}" onclick="accordionDropdown('{{ type.id }}', '{{ type.name}}')"
-        class="w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge category-button">
-            {{ type.name }}
-            <span id="arrow_{{ type.id }}" class="arrow">❯</span>
-        </button>
-        
-        <!-- List of health infos under specific category -->
-        <ul id="health_section_{{ type.id }}" class="w3-container w3-ul w3-card w3-large accordion-content">
-            {% for entry in user_health_entries %}
-                {% if entry.health.type_id == type.id %}
-                    <li class="w3-display-container">
-                        <button onclick="toggleModal('modal_{{ entry.id }}')"
-                        class="w3-btn w3-circle error-colour w3-display-topright btn-hover-red">
-                            <i class="fa-regular fa-trash-can"></i>
-                        </button>
-                        <p><strong>{{ entry.health.name }}</strong></p>
-                        <p>{{ entry.description }}</p>
-                    </li>
-                    
-                    <!-- Delete health info popup -->
-                    <div id="modal_{{ entry.id }}" class="w3-modal">
-                        <div class="w3-modal-content">
-                            <div class="w3-container">
-                                <p>Are you sure you want to delete: <strong>{{ entry.health.name }}</strong>?</p>
-                                <span onclick="toggleModal('modal_{{ entry.id }}')"
-                                class="w3-button">
-                                    Cancel
-                                </span>
-                                
-                                <form method="POST" action="/remove-health-info">
-                                    <input type="hidden" name="entry_id" value="{{ entry.id }}">
+        <div>
+            <button id="dropdown_{{ type.id }}" onclick="accordionDropdown('{{ type.id }}', '{{ type.name}}')"
+            class="w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge category-button">
+                {{ type.name }}
+                <span id="arrow_{{ type.id }}" class="arrow">❯</span>
+            </button>
+            
+            <!-- List of health infos under specific category -->
+            <ul id="health_section_{{ type.id }}" class="w3-container w3-ul w3-card w3-large accordion-content">
+                {% for entry in user_health_entries %}
+                    {% if entry.health.type_id == type.id %}
+                        <li class="w3-display-container">
+                            <button onclick="toggleModal('modal_{{ entry.id }}')"
+                            class="w3-btn w3-circle error-colour w3-display-topright btn-hover-red">
+                                <i class="fa-regular fa-trash-can"></i>
+                            </button>
+                            <p><strong>{{ entry.health.name }}</strong></p>
+                            <p>{{ entry.description }}</p>
+                        </li>
+                        
+                        <!-- Delete health info popup -->
+                        <div id="modal_{{ entry.id }}" class="w3-modal">
+                            <div class="w3-modal-content">
+                                <div class="w3-container">
+                                    <p>Are you sure you want to delete: <strong>{{ entry.health.name }}</strong>?</p>
+                                    <span onclick="toggleModal('modal_{{ entry.id }}')"
+                                    class="w3-button">
+                                        Cancel
+                                    </span>
                                     
-                                    <button type="submit"
-                                            onclick="toggleModal('modal_{{ entry.id }}')"
-                                            class="w3-btn w3-error-colour">
-                                        Confirm Delete
-                                    </button>
-                                </form>
+                                    <form method="POST" action="/remove-health-info">
+                                        <input type="hidden" name="entry_id" value="{{ entry.id }}">
+                                        
+                                        <button type="submit"
+                                                onclick="toggleModal('modal_{{ entry.id }}')"
+                                                class="w3-btn w3-error-colour">
+                                            Confirm Delete
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
-                {% endif %}
-            {% endfor %}
+                    {% endif %}
+                {% endfor %}
             </ul>
     {% endfor %}
 </div>
