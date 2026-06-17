@@ -336,6 +336,10 @@ nav {
         display: block;
         overflow-x: auto;
     }
+
+    .w3-flex {
+        flex-direction: column;
+    }
 }
 
 .status-badge {
@@ -359,6 +363,12 @@ nav {
 .status-Overdue {
     background: #FEE2E2;
     color: #991B1B;
+}
+
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* #endregion */

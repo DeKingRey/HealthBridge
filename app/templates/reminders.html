@@ -14,7 +14,7 @@
 
 <div class="w3-flex">
     <!-- Dropdowns for each reminder category showing user their reminders -->
-    <div class="reminder-list w3-container" style="flex: 0.5">
+    <div class="reminder    -list w3-container" style="flex: 0.5">
         {% for type in types %}
             <button id="dropdown_{{ type.id }}" onclick="accordionDropdown('{{ type.id }}', '{{ type.name }}')"
             class="w3-block w3-left-align w3-card secondary-colour w3-text-bold w3-xlarge category-button">
@@ -64,32 +64,35 @@
         {% endfor %}
     </div>
 
+
     <div class="w3-container tracker-card" style="flex: 1">
         <h2>Medication Tracker</h2>
-        <table class="w3-table-all">
-            <thead class="w3-xlarge">
-                <tr class="secondary-colour w3-border">
-                    <th>Name</th>
-                    <th>Time</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            {% for reminder in user_reminders %}
-                {% if reminder.type_id == 2 %} <!-- Medication id is 2 -->
-                    <tr id="med_status_{{ reminder.id }}" data-status-id="{{ reminder.status.id }}">
-                        <td>{{ reminder.name }}</td>
-                        <td>{{ reminder.display_time }}</td>
-                        <td>{{ reminder.description }}</td>
-                        <td>
-                            <span class="status-badge status-{{ reminder.status.name }}">
-                                {{ reminder.status.name }}
-                            </span>
-                        </td>
+        <div class="table-scroll">
+            <table class="w3-table-all">
+                <thead class="w3-xlarge">
+                    <tr class="secondary-colour w3-border">
+                        <th>Name</th>
+                        <th>Time</th>
+                        <th>Description</th>
+                        <th>Status</th>
                     </tr>
-                {% endif %}
-            {% endfor %}
-        </table>
+                </thead>
+                {% for reminder in user_reminders %}
+                    {% if reminder.type_id == 2 %} <!-- Medication id is 2 -->
+                        <tr id="med_status_{{ reminder.id }}" data-status-id="{{ reminder.status.id }}">
+                            <td>{{ reminder.name }}</td>
+                            <td>{{ reminder.display_time }}</td>
+                            <td>{{ reminder.description }}</td>
+                            <td>
+                                <span class="status-badge status-{{ reminder.status.name }}">
+                                    {{ reminder.status.name }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </div>
     </div>
 </div>
 
