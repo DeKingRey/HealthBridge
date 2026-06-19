@@ -1,42 +1,47 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>Login...</h1>
+    <div class="w3-card w3-round-large w3-white w3-hover-shadow form-card">
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
+        <form method="POST">
+            {{ form.hidden_tag() }}
 
-        <!-- Email Div -->
-        <div>
-            {{ form.email.label }}
-            {{ form.email }}
+            <!-- Email Div -->
+            <div class="form-field">
+                {{ form.email.label }}
+                {{ form.email }}
 
-            {% for error in form.email.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
+                {% for error in form.email.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
 
-        <!-- Password Div -->
-        <div>
-            {{ form.password.label }}
-            {{ form.password }}
+            <!-- Password Div -->
+            <div class="form-field">
+                {{ form.password.label }}
+                {{ form.password }}
 
-            {% for error in form.password.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
-        
-        <label for="remember">Remember Me</label>
-        <input name="remember" type="checkbox" value="True">
+                {% for error in form.password.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+            
+            <label for="remember" style="text-align: left;">
+                Remember Me
+                <input name="remember" type="checkbox" value="True" class="w3-check" style="cursor: pointer;">
+            </label>
 
-        {{ form.submit }}
-    </form>
+            <button type="submit" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+                Login
+            </button>
+        </form>
 
-    <p>Don't have an account? <a href="{{ url_for('main.register') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
-        Sign Up
-    </a></p>
+        <p>Don't have an account? <a href="{{ url_for('main.register') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+            Sign Up
+        </a></p>
 
-    <p>Forgot your password? <a href="{{ url_for('main.reset_password_request') }}"
-        class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
-        Reset Password
-    </a></p>
+        <p>Forgot your password? <a href="{{ url_for('main.reset_password_request') }}"
+            class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+            Reset Password
+        </a></p>
+    </div>
 {% endblock %}
