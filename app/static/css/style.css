@@ -467,12 +467,27 @@ input:focus, select:focus, textarea:focus {
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
+
+    transition: all 0.2s ease;
 }
 
-.icons i {
-    position: relative;
-    left: 440px;
-    top: 20px;
+.password-wrapper i:hover {
+    transform: translateY(-60%) scale(1.05);
+    opacity: 0.8
+}
+
+select {
+    /* Removes default styling */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.2rem 2.5rem 1.2rem 1rem;
+
+    cursor: pointer;
 }
 
 /* #endregion */

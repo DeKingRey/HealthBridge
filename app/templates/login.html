@@ -20,7 +20,7 @@
                 {{ form.password.label }}
 
                 <div class="password-wrapper">
-                    {{ form.password }}
+                    {{ form.password(class="password") }}
                     <i class="fa-regular fa-eye"></i>
                 </div>
 
@@ -48,4 +48,6 @@
             Reset Password
         </a></p>
     </div>
+
+    <script src="static/js/toggle_password.js"></script>
 {% endblock %}

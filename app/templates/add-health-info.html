@@ -1,61 +1,62 @@
 {% extends "layout.html" %}
 {% block content %}
+    <div class="w3-card w3-round-large w3-white w3-hover-shadow form-card">
+        <form method="POST">
+            {{ form.hidden_tag() }}
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
-
-        <!-- Hidden inputs if the user uses pre existing info -->
-        <input type="hidden" id="health_info_id" name="health_info_id">
-        <input type="hidden" id="existing_info" name="existing_info" value="False">
-        
-        <!-- Search input for pre existing health records -->
-        <div>
-            <div class="w3.container background-colour">
-                <label for="search">Search for pre-existing health info:</label>
-                <input type="text" placeholder="Search..." name="search" id="search_input" autocomplete="off">
-
-                <div class="w3-bar-block theme" id="suggestions" style="width: 5rem;"></div>
-            </div>
-        </div>
-        
-        <!-- Name Div -->
-        <div>
-            {{ form.name.label }}
-            {{ form.name }}
-
-            {% for error in form.name.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
-
-        <!-- Description Div -->
-        <div>
-            {{ form.default_desc.label }}
-            {{ form.default_desc }}
+            <!-- Hidden inputs if the user uses pre existing info -->
+            <input type="hidden" id="health_info_id" name="health_info_id">
+            <input type="hidden" id="existing_info" name="existing_info" value="False">
             
-            {% for error in form.default_desc.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
+            <!-- Search input for pre existing health records -->
+            <div>
+                <div class="w3.container background-colour">
+                    <label for="search">Search for pre-existing health info:</label>
+                    <input type="text" placeholder="Search..." name="search" id="search_input" autocomplete="off">
 
-        <!-- Type ID Div -->
-        <div>
-            {{ form.type_id.label }}
-            {{ form.type_id() }}
+                    <div class="w3-bar-block theme" id="suggestions" style="width: 5rem;"></div>
+                </div>
+            </div>
+            
+            <!-- Name Div -->
+            <div class="form-field">
+                {{ form.name.label }}
+                {{ form.name }}
 
-            {% for error in form.type_id.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
-        
-        <div class="w3-btn w3-round-xlarge btn-hover-colour accent-colour" style="margin-bottom: 20px;">
-            {{ form.submit }}
-        </div>
-    </form>
+                {% for error in form.name.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
 
-    <a href="{{ url_for('main.health_info') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
-        Return
-    </a>
+            <!-- Description Div -->
+            <div class="form-field">
+                {{ form.default_desc.label }}
+                {{ form.default_desc }}
+                
+                {% for error in form.default_desc.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <!-- Type ID Div -->
+            <div class="form-field">
+                {{ form.type_id.label }}
+                {{ form.type_id() }}
+
+                {% for error in form.type_id.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour" style="margin-bottom: 50px;">
+                Add Info
+            </button>
+        </form>
+
+        <a href="{{ url_for('main.health_info') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+            Return
+        </a>
+    </div>
 
     <script>
         const search_content = {{ search_content|tojson }}; // Gets info to be searched through
