@@ -18,7 +18,11 @@
             <!-- Password Div -->
             <div class="form-field">
                 {{ form.password.label }}
-                {{ form.password }}
+
+                <div class="password-wrapper">
+                    {{ form.password }}
+                    <i class="fa-regular fa-eye"></i>
+                </div>
 
                 {% for error in form.password.errors %}
                     <p class="form-error">{{ error }}</p>
