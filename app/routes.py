@@ -13,7 +13,7 @@ Date: 27-02-2026
 
 from flask import (render_template, Blueprint, url_for,
                    redirect, request, make_response,
-                   current_app)
+                   current_app, session)
 from flask_login import (login_required, login_user, logout_user,
                          current_user)
 from app.models import (User, Health, UserHealth, HealthType,
@@ -367,6 +367,13 @@ def login():
                         Please check your emails to verify your account"""
                     else:
                         message = "Email failed to send - try again"
+
+                    # Stores send email info so resend email can access
+                    session["pending_email"] = {
+                        "email": user.email,
+                        "subject": subject,
+                        "body": body
+                    }
                     return render_template("email-sent.html",
                                            header="Please verify your email",
                                            message=message,
@@ -395,6 +402,31 @@ def register():
 
     # Adds user to database if validated successfully
     if form.validate_on_submit():
+        remember_flag = request.form.get("remember") == "True"
+        existing_user = User.query.filter_by(email=form.email.data).first()
+
+        # Redirects non verified users to verify page and resends verify email
+        if existing_user and not existing_user.is_verified:
+            subject, body = register_email_info(existing_user.email,
+                                                remember_flag)
+            success = send_email(existing_user.email, subject, body)
+
+            if success:
+                message = """
+                Please check your emails to verify your account"""
+            else:
+                message = "Email failed to send - try again"
+            # Stores send email info so resend email can access
+            session["pending_email"] = {
+                "email": form.email.data,
+                "subject": subject,
+                "body": body
+            }
+            return render_template("email-sent.html",
+                                   header="Please verify your email",
+                                   message=message,
+                                   email_failed=success)
+
         # Generates a secure password
         hashed_password = bcrypt.generate_password_hash(form.password.data)
 
@@ -402,8 +434,6 @@ def register():
                         password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
-
-        remember_flag = request.form.get("remember") == "True"
 
         # Sends verification email
         subject, body = register_email_info(form.email.data, remember_flag)
@@ -414,9 +444,16 @@ def register():
             Please check your emails to verify your account"""
         else:
             message = "Email failed to send - try again"
+        # Stores send email info so resend email can access
+        session["pending_email"] = {
+            "email": form.email.data,
+            "subject": subject,
+            "body": body
+        }
         return render_template("email-sent.html",
                                header="Please verify your email",
-                               message=message, email_failed=success)
+                               message=message,
+                               email_failed=True)
     return render_template("register.html", header="Register",
                            form=form)
 
@@ -438,10 +475,11 @@ def reset_password_request():
                 _external=True
             )
 
+            body = "Reset Password Request"
+            subject = f"Click to reset: {reset_url}"
             success = send_email(
                 user.email,
-                "Reset Password Request",
-                f"Click to reset: {reset_url}"
+                body, subject
             )
 
         if success:
@@ -449,9 +487,16 @@ def reset_password_request():
             Please check your emails to reset your password"""
         else:
             message = "Email failed to send - try again"
+        # Stores send email info so resend email can access
+        session["pending_email"] = {
+            "email": user.data,
+            "subject": subject,
+            "body": body
+        }
         return render_template("email-sent.html",
                                header="Reset Password",
-                               message=message, email_failed=success)
+                               message=message,
+                               email_failed=success)
     return render_template("reset-password.html", form=form,
                            email_verified=False)
 
@@ -500,6 +545,24 @@ def verify_email(token):
             login_user(user, remember=remember_flag)
             return redirect(url_for("main.dashboard"))
     return redirect(url_for("main.login"))
+
+
+@main.route("/resend-email", methods=["POST"])
+def resend_email():
+    pending = session.get("pending_email")  # Gets stored email info
+    if not pending:
+        return render_template("email-sent.html",
+                               header="Error",
+                               message="Nothing to resend",
+                               email_failed=True)
+    success = send_email(pending["email"], pending["subject"], pending["body"])
+    message = ("Email resent! Please check your inbox." if success
+               else "Email failed to send - try again")
+
+    return render_template("email-sent.html",
+                           header="Resent Email",
+                           message=message,
+                           email_failed=success)
 
 
 def send_email(email, subject, body, attachments=None):

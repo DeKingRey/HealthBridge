@@ -46,9 +46,11 @@ class RegisterForm(FlaskForm):
 
     # Checks if username already exists
     def validate_email(self, email):
-        existing_user_email = User.query.filter_by(
+        existing_user = User.query.filter_by(
             email=email.data).first()
-        if existing_user_email:
+
+        # Only raises error for verified users - others redirect to verify page
+        if existing_user and existing_user.is_verified:
             raise ValidationError(
                 "There is already an account for that email."
             )

@@ -3,11 +3,19 @@
 
 <p>{{ message }}</p>
 
-{% if email_failed %}
-    <button onclick="history.back()"
-    class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
-        Go Back
-    </button>
+<!-- Only displays resend email if email was valid -->
+{% if not email_failed %}
+    <form action="{{ url_for('main.resend_email') }}" method="POST">
+        <button onclick="{{ url_for(main.send_email(email, subject, body)) }}"
+        class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+            Resend Email
+        </button>
+    </form>
 {% endif %}
+
+<button onclick="history.back()"
+class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+    Go Back
+</button>
 
 {% endblock %}
