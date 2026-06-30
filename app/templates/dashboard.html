@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h1>{{ current_user.username }}</h1>
+<h1>{{ current_user.first_name }}</h1>
 {% if current_user.is_admin %} <h3>You are an admin</h3> {% endif %}
 
 <div class="btns">

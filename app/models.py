@@ -4,9 +4,13 @@ from flask_login import UserMixin
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), nullable=False, unique=False)
+    first_name = db.Column(db.String(32), nullable=False, unique=False)
+    last_name = db.Column(db.String(42), nullable=False, unique=False)
+    date_of_birth = db.Column(db.DateTime, nullable=False)
+
     email = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
+
     is_verified = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
 

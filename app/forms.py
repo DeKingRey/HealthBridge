@@ -1,10 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import (StringField, PasswordField, SubmitField,
+from wtforms import (DateField, StringField, PasswordField, SubmitField,
                      TextAreaField, SelectField, TimeField)
 from wtforms.validators import (InputRequired, Length, ValidationError,
                                 EqualTo, Email, DataRequired, Optional)
 from wtforms.fields import DateTimeLocalField
-from config import (MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH,
+from config import (MIN_FIRST_NAME_LENGTH, MAX_FIRST_NAME_LENGTH,
+                    MIN_LAST_NAME_LENGTH, MAX_LAST_NAME_LENGTH,
                     MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH,
                     MIN_HEALTH_LENGTH, MAX_HEALTH_LENGTH,
                     MIN_DESC_LENGTH, MAX_DESC_LENGTH,
@@ -12,14 +13,26 @@ from config import (MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH,
                     MIN_REMINDER_LENGTH, MAX_REMINDER_LENGTH)
 from . models import User
 from zoneinfo import ZoneInfo
-from datetime import datetime
+from datetime import date, datetime
 
 
 class RegisterForm(FlaskForm):
-    username = StringField("Username", validators=[
+    first_name = StringField("First Name(s)", validators=[
         InputRequired(),
-        Length(min=MIN_USERNAME_LENGTH, max=MAX_USERNAME_LENGTH)],
-        render_kw={"placeholder": "Username"}
+        Length(min=MIN_FIRST_NAME_LENGTH, max=MAX_FIRST_NAME_LENGTH)],
+        render_kw={"placeholder": "First Name(s)"}
+    )
+
+    last_name = StringField("Surname(s)", validators=[
+        InputRequired(),
+        Length(min=MIN_LAST_NAME_LENGTH, max=MAX_LAST_NAME_LENGTH)],
+        render_kw={"placeholder": "Surname(s)"}
+    )
+
+    date_of_birth = DateField(
+        "Date of Birth",
+        format="%Y-%m-%d",
+        validators=[InputRequired()]
     )
 
     email = StringField("Email", validators=[
@@ -43,6 +56,13 @@ class RegisterForm(FlaskForm):
     )
 
     submit = SubmitField("Register")
+
+    # Ensures that the date of birth is not in the future or impossible
+    def validate_date_of_birth(self, date_of_birth):
+        if date_of_birth.data and date_of_birth.data > date.today():
+            raise ValidationError(
+                "Date of birth cannot be in the future"
+            )
 
     # Checks if username already exists
     def validate_email(self, email):

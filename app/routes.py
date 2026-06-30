@@ -177,11 +177,12 @@ def send_health_info():
         return render_template("email-sent.html",
                                header="Invalid Email Address",
                                message="The email you inputted was invalid",
-                               email_failed=True)
+                               success=False)
 
     user_info = User.query.get(current_user.id)
-    subject = f"Health Info for {user_info.username}"
-    body = f"Attached is all health information for {user_info.username}."
+    subject = f"Health Info for {user_info.first_name} {user_info.last_name}"
+    body = f"""Attached is all health information for 
+               {user_info.first_name} {user_info.last_name}."""
     pdf = generate_health_pdf(user_info)
 
     send_email(email, subject, body, attachments=[("patient_summary.pdf",
@@ -209,8 +210,8 @@ def generate_health_pdf(user):
     user_health_entries = get_user_health_entries()
 
     data = {
-        "name": user.username,
-        "dob": "placeholder dob",
+        "name": f"{user.first_name} {user.last_name}",
+        "dob": user.date_of_birth,
         "types": types,
         "user_health_entries": user_health_entries
     }
@@ -377,7 +378,7 @@ def login():
                     return render_template("email-sent.html",
                                            header="Please verify your email",
                                            message=message,
-                                           email_failed=success)
+                                           success=success)
             else:
                 form.password.errors.append("Password is incorrect")
         else:
@@ -425,13 +426,15 @@ def register():
             return render_template("email-sent.html",
                                    header="Please verify your email",
                                    message=message,
-                                   email_failed=success)
+                                   success=success)
 
         # Generates a secure password
         hashed_password = bcrypt.generate_password_hash(form.password.data)
 
-        new_user = User(username=form.username.data, email=form.email.data,
-                        password=hashed_password)
+        new_user = User(first_name=form.first_name.data,
+                        last_name=form.last_name.data,
+                        email=form.email.data, password=hashed_password,
+                        date_of_birth=form.date_of_birth.data)
         db.session.add(new_user)
         db.session.commit()
 
@@ -496,7 +499,7 @@ def reset_password_request():
         return render_template("email-sent.html",
                                header="Reset Password",
                                message=message,
-                               email_failed=success)
+                               success=success)
     return render_template("reset-password.html", form=form,
                            email_verified=False)
 
@@ -554,7 +557,7 @@ def resend_email():
         return render_template("email-sent.html",
                                header="Error",
                                message="Nothing to resend",
-                               email_failed=True)
+                               success=False)
     success = send_email(pending["email"], pending["subject"], pending["body"])
     message = ("Email resent! Please check your inbox." if success
                else "Email failed to send - try again")
@@ -562,7 +565,7 @@ def resend_email():
     return render_template("email-sent.html",
                            header="Resent Email",
                            message=message,
-                           email_failed=success)
+                           success=success)
 
 
 def send_email(email, subject, body, attachments=None):

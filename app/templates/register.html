@@ -14,12 +14,32 @@
                 {% endfor %}
             </div>
 
-            <!-- Username Div -->
+            <!-- First Name Div -->
             <div class="form-field">
-                {{ form.username.label }}
-                {{ form.username }}
+                {{ form.first_name.label }}
+                {{ form.first_name }}
                 
-                {% for error in form.username.errors %}
+                {% for error in form.first_name.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <!-- Last Name Div -->
+            <div class="form-field">
+                {{ form.last_name.label }}
+                {{ form.last_name }}
+                
+                {% for error in form.last_name.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <!-- DOB Div -->
+            <div class="form-field">
+                {{ form.date_of_birth.label }}
+                {{ form.date_of_birth }}
+                
+                {% for error in form.date_of_birth.errors %}
                     <p class="form-error">{{ error }}</p>
                 {% endfor %}
             </div>
