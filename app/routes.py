@@ -211,7 +211,7 @@ def generate_health_pdf(user):
 
     data = {
         "name": f"{user.first_name} {user.last_name}",
-        "dob": user.date_of_birth,
+        "dob": user.date_of_birth.strftime("%d/%m/%Y"),
         "types": types,
         "user_health_entries": user_health_entries
     }

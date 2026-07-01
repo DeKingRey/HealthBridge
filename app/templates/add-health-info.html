@@ -9,13 +9,15 @@
             <input type="hidden" id="existing_info" name="existing_info" value="False">
             
             <!-- Search input for pre existing health records -->
-            <div>
-                <div class="w3.container background-colour">
-                    <label for="search">Search for pre-existing health info:</label>
-                    <input type="text" placeholder="Search..." name="search" id="search_input" autocomplete="off">
+            <div class="search-container">
+                <label for="search_input">Search for pre-existing health info</label>
 
-                    <div class="w3-bar-block theme" id="suggestions" style="width: 5rem;"></div>
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Search..." name="search" id="search_input" autocomplete="off">
                 </div>
+
+                <div id="suggestions"></div>
             </div>
             
             <!-- Name Div -->

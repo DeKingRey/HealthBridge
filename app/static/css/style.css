@@ -490,4 +490,51 @@ select {
     cursor: pointer;
 }
 
+/* #region Search Bar */
+
+.search-container {
+    position: relative;
+    text-align: left;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+#search_input {
+    padding-left: 2.8rem;
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 1rem;
+}
+
+#suggestions {
+    position: absolute;
+    width: 100%;
+    margin-top: 0.3rem;
+
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+    z-index: 100;
+}
+
+#suggestions .w3-bar-item {
+    padding: 0.9rem 1rem;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+#suggestions .w3-bar-item:hover {
+    background: #f1f5f9;
+}
+
 /* #endregion */
+/* endregion */
