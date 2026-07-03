@@ -43,7 +43,11 @@
             <!-- Type ID Div -->
             <div class="form-field">
                 {{ form.type_id.label }}
-                {{ form.type_id() }}
+
+                <div class="form-wrapper">
+                    {{ form.type_id() }}
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
 
                 {% for error in form.type_id.errors %}
                     <p class="form-error">{{ error }}</p>

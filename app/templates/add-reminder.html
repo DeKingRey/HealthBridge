@@ -1,6 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
-
     <style>
         #appointment_fields,
         #medication_fields {
@@ -8,65 +7,71 @@
         }
     </style>
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        
-        <!-- Name Div -->
-        <div>
-            {{ form.name.label }}
-            {{ form.name }}
-
-            {% for error in form.name.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
-
-        <!-- Description Div -->
-        <div>
-            {{ form.desc.label }}
-            {{ form.desc }}
+    <div class="w3-card w3-round-large w3-white w3-hover-shadow form-card">
+        <form method="POST">
+            {{ form.hidden_tag() }}
             
-            {% for error in form.desc.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
+            <!-- Name Div -->
+            <div class="form-field">
+                {{ form.name.label }}
+                {{ form.name }}
 
-        <!-- Type ID Div -->
-        <div>
-            {{ form.type_id.label }}
-            {{ form.type_id(id="reminder_type", onchange="toggleFields()") }}
+                {% for error in form.name.errors %}
+                    <p class="form-errors">{{ error }}</p>
+                {% endfor %}
+            </div>
 
-            {% for error in form.type_id.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
+            <!-- Description Div -->
+            <div class="form-field">
+                {{ form.desc.label }}
+                {{ form.desc }}
+                
+                {% for error in form.desc.errors %}
+                    <p class="form-errors">{{ error }}</p>
+                {% endfor %}
+            </div>
 
-        <div id="appointment_fields">
-            {{ form.appointment_datetime.label }}
-            {{ form.appointment_datetime }}
+            <!-- Type ID Div -->
+            <div class="form-field">
+                {{ form.type_id.label }}
 
-            {% for error in form.appointment_datetime.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
+                <div class="form-wrapper">
+                    {{ form.type_id(id="reminder_type", onchange="toggleFields()") }}
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
 
-        <div id="medication_fields">
-            {{ form.medication_time.label }}
-            {{ form.medication_time }}
+                {% for error in form.type_id.errors %}
+                    <p class="form-errors">{{ error }}</p>
+                {% endfor %}
+            </div>
 
-            {% for error in form.medication_time.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
-        </div>
-        
-        <div class="w3-btn w3-round-xlarge btn-hover-colour accent-colour" style="margin-bottom: 20px;">
-            {{ form.submit }}
-        </div>
-    </form>
+            <div id="appointment_fields" class="form-field">
+                {{ form.appointment_datetime.label }}
+                {{ form.appointment_datetime }}
 
-    <a href="{{ url_for('main.reminders') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
-        Return
-    </a>
+                {% for error in form.appointment_datetime.errors %}
+                    <p class="form-errors">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div id="medication_fields" class="form-field">
+                {{ form.medication_time.label }}
+                {{ form.medication_time }}
+
+                {% for error in form.medication_time.errors %}
+                    <p class="form-errors">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour" style="margin-bottom: 50px;">
+                Add Reminder
+            </button>
+        </form>
+
+        <a href="{{ url_for('main.reminders') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+            Return
+        </a>
+    </div>
 
     <script>
         function toggleFields() {

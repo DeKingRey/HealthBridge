@@ -25,6 +25,7 @@
 .error-colour{color:#fffdf7ff !important; background-color:#DC2626 !important}
 
 .w3-theme-light {color:#000 !important; background-color:#fffbf0 !important}
+
 .w3-theme-dark {color:#fff !important; background-color:#826200 !important}
 .w3-theme-action {color:#fff !important; background-color:#826200 !important}
 
@@ -222,7 +223,6 @@ nav {
     gap: 1.5rem;
 }
 
-
 .category-button {
     border-radius: 14px;
     padding: 1rem 1.25rem;
@@ -246,6 +246,8 @@ nav {
     margin: 20px 0;
 
     transition: all 0.25s ease;
+
+    position: relative;
 }
 
 .w3-display-container:hover {
@@ -457,11 +459,12 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 0 3px rgba(47, 133, 90, 0.15);
 }
 
-.password-wrapper {
+/* Wrapper is to display icons in form inputs */
+.form-wrapper {
     position: relative;
 }
 
-.password-wrapper i {
+.form-wrapper i {
     position: absolute;
     right: 1rem;
     top: 50%;
@@ -471,7 +474,7 @@ input:focus, select:focus, textarea:focus {
     transition: all 0.2s ease;
 }
 
-.password-wrapper i:hover {
+.form-wrapper i:hover {
     transform: translateY(-60%) scale(1.05);
     opacity: 0.8
 }
@@ -482,11 +485,13 @@ select {
     -webkit-appearance: none;
     -moz-appearance: none;
 
+    width: 100%;
+    padding: 1.2rem 3rem 1.2rem 1rem;
+
     background: white;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    padding: 1.2rem 2.5rem 1.2rem 1rem;
-
+    
     cursor: pointer;
 }
 
