@@ -56,7 +56,7 @@
                             class="w3-btn w3-circle error-colour w3-display-topright btn-hover-red">
                                 <i class="fa-regular fa-trash-can"></i>
                             </button>
-                            <p><strong>{{ entry.health.name }}</strong></p>
+                            <h3><strong>{{ entry.health.name }}</strong></h3>
                             <p>{{ entry.description }}</p>
                         </li>
                         
@@ -64,21 +64,25 @@
                         <div id="modal_{{ entry.id }}" class="w3-modal">
                             <div class="w3-modal-content">
                                 <div class="w3-container">
-                                    <p>Are you sure you want to delete: <strong>{{ entry.health.name }}</strong>?</p>
-                                    <span onclick="toggleModal('modal_{{ entry.id }}')"
-                                    class="w3-button">
-                                        Cancel
-                                    </span>
-                                    
-                                    <form method="POST" action="/remove-health-info">
-                                        <input type="hidden" name="entry_id" value="{{ entry.id }}">
-                                        
-                                        <button type="submit"
-                                                onclick="toggleModal('modal_{{ entry.id }}')"
-                                                class="w3-btn w3-error-colour">
-                                            Confirm Delete
+                                    <h3>Delete Health Information</h3>
+                                    <p>Are you sure you want to permanently delete: <strong>{{ entry.health.name }}</strong>?</p>
+                                    <p class="modal-warning">This action cannot be undone.</p>
+
+                                    <div class="modal-actions">
+                                        <button type="button" onclick="toggleModal('modal_{{ entry.id }}')"
+                                        class="w3-button">
+                                            Cancel
                                         </button>
-                                    </form>
+                                        
+                                        <form method="POST" action="/remove-health-info">
+                                            <input type="hidden" name="entry_id" value="{{ entry.id }}">
+                                            
+                                            <button type="submit"
+                                                    class="w3-button w3-error-colour">
+                                                Confirm Delete
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>

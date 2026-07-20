@@ -542,4 +542,68 @@ select {
 }
 
 /* #endregion */
-/* endregion */
+
+/* #endregion */
+
+/* #region Modals */
+
+.w3-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    margin: auto;
+
+    background: rgba(15, 23, 42, 0.65);
+
+    z-index: 10000;
+}
+
+.w3-modal-content {
+    background-color: white;
+    border-radius: 18px;
+    padding: 2rem;
+
+    max-width: 420px;
+    max-height: 10% auto;
+
+    text-align: center;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+
+    transition: all 0.2s ease;
+}
+
+.w3-modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.w3-modal-content p {
+    margin: 0.75rem 0;
+}
+
+.modal-warning {
+    color: var(--error-colour);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.modal-actions form {
+    margin: 0;
+}
+
+.modal-actions button {
+    min-width: 140px;
+}
+
+/* #endregion */
