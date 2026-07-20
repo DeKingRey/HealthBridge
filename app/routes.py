@@ -13,7 +13,7 @@ Date: 27-02-2026
 
 from flask import (render_template, Blueprint, url_for,
                    redirect, request, make_response,
-                   current_app, session)
+                   current_app, session, flash)
 from flask_login import (login_required, login_user, logout_user,
                          current_user)
 from app.models import (User, Health, UserHealth, HealthType,
@@ -143,6 +143,7 @@ def add_health_info():
         db.session.add(new_user_health_info)
         db.session.commit()
 
+        flash("Health info added", "success")
         return redirect(url_for("main.health_info"))
     return render_template("add-health-info.html", header="Add Health Info",
                            form=form, search_content=search_content)

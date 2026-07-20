@@ -41,21 +41,25 @@
                             <div id="modal_{{ reminder.id }}" class="w3-modal">
                                 <div class="w3-modal-content">
                                     <div class="w3-container">
-                                        <p>Are you sure you want to delete: <strong>{{ reminder.name }}</strong>?</p>
-                                        <span onclick="toggleModal('modal_{{ reminder.id }}')"
-                                        class="w3-button">
-                                            Cancel
-                                        </span>
-                                        
-                                        <form method="POST" action="/remove-reminder">
-                                            <input type="hidden" name="reminder_id" value="{{ reminder.id }}">
-                                            
-                                            <button type="submit"
-                                                    onclick="toggleModal('modal_{{ reminder.id }}')"
-                                                    class="w3-btn w3-error-colour">
-                                                Confirm Delete
+                                        <h3>Delete Reminder</h3>
+                                        <p>Are you sure you want to permanently delete: <strong>{{ reminder.name }}</strong>?</p>
+                                        <p class="modal-warning">This action cannot be undone.</p>
+
+                                        <div class="modal-actions">
+                                            <button type="button" onclick="toggleModal('modal_{{ reminder.id }}')"
+                                            class="w3-btn accent-colour">
+                                                Cancel
                                             </button>
-                                        </form>
+                                            
+                                            <form method="POST" action="/remove-reminder">
+                                                <input type="hidden" name="reminder_id" value="{{ reminder.id }}">
+                                                
+                                                <button type="submit"
+                                                        class="w3-btn error-colour">
+                                                    Confirm Delete
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

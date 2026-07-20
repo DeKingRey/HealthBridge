@@ -1,8 +1,8 @@
 /* Primary Colour Scheme */
 :root {
-    --primary-colour: #2f855aff;
-    --secondary-colour: #a7c4a0ff;
-    --accent-colour: #f6ad55ff;
+    --primary-colour: #1B5E5A;
+    --secondary-colour: #B7D7D2;
+    --accent-colour: #E3A857;
     --background-colour: #f8fafc;
     --text-colour: #2d3748ff;
     --error-colour: #DC2626;
@@ -19,9 +19,9 @@
 }
 
 /* #region Theme Colours */
-.primary-colour {color:#fffdf7ff !important; background-color:#2f855aff !important}
-.secondary-colour {background-color:#a7c4a0ff !important}
-.accent-colour {color:#fffdf7ff !important; background-color:#f6ad55ff !important}
+.primary-colour {color:#fffdf7ff !important; background-color:#1B5E5A !important}
+.secondary-colour {background-color:#B7D7D2 !important}
+.accent-colour {color:#fffdf7ff !important; background-color:#E3A857 !important}
 .error-colour{color:#fffdf7ff !important; background-color:#DC2626 !important}
 
 .w3-theme-light {color:#000 !important; background-color:#fffbf0 !important}
@@ -35,8 +35,8 @@
 .w3-border-theme {border-color:#ffc107 !important}
 .black-container {background-color: #2d3748ff; color: #fffdf7ff !important}
 
-.hover-colour:hover {color:#fffdf7ff !important; background-color:#f6ad55ff !important}
-.btn-hover-colour:hover {color:#fffdf7ff !important; background-color:#f39523 !important}
+.hover-colour:hover {color:#fffdf7ff !important; background-color:#e09226 !important}
+.btn-hover-colour:hover {color:#fffdf7ff !important; background-color:#e09226 !important}
 .btn-hover-red:hover {color:#fffdf7ff !important; background-color:#d22525 !important}
 .w3-hover-text-theme:hover {color:#ffc107 !important}
 .w3-hover-border-theme:hover {border-color:#ffc107 !important}
@@ -137,6 +137,21 @@ footer {
     font-weight: 600;
 }
 
+/* Styles the notifications, with an animation */ 
+.popup-notification {
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-10px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-10px); }
+}
+
 /* #endregion */
 
 /* #region Navbar */
@@ -231,7 +246,7 @@ nav {
 }
 
 .category-button:hover {
-    background: #b8d2b2 !important;
+    background: #9dd2ca !important;
     transform: translateX(4px);
 }
 
@@ -556,6 +571,9 @@ select {
     background: rgba(15, 23, 42, 0.65);
 
     z-index: 10000;
+
+    justify-content: center;
+    align-items: center;
 }
 
 .w3-modal-content {
