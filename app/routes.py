@@ -203,7 +203,7 @@ def download_health_pdf():
     response.headers["Content-Disposition"] = (
             "attachment; filename=patient_summary.pdf"
     )
-    flash("Health info downloaded", "info")
+
     return response
 
 

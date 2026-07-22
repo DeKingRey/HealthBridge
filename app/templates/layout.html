@@ -130,10 +130,15 @@
             notification.innerText = message;
             document.body.appendChild(notification);
 
-            /* Removes after an interval
+            // Removes after an interval
             setTimeout(() => {
-                notification.remove();
-            }, 30000);*/
+                notification.classList.add("hide")
+
+                // The close animation will play first, then the noti will delete
+                notification.addEventListener("animationend", () => {
+                    notification.remove();
+                }, {once: true});
+            }, 6000);
         }
     </script>
 
