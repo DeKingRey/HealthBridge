@@ -164,6 +164,7 @@ def remove_health_info():
     # Deletes user health entry
     db.session.delete(user_health_entry)
     db.session.commit()
+    flash("Health info deleted", "success")
     return redirect(url_for("main.health_info"))
 
 
@@ -202,7 +203,7 @@ def download_health_pdf():
     response.headers["Content-Disposition"] = (
             "attachment; filename=patient_summary.pdf"
     )
-
+    flash("Health info downloaded", "info")
     return response
 
 
@@ -249,6 +250,7 @@ def remove_reminder():
     # Deletes reminder
     db.session.delete(user_reminder)
     db.session.commit()
+    flash("Reminder deleted", "success")
     return redirect(url_for("main.reminders"))
 
 
@@ -324,7 +326,7 @@ def add_reminder():
             ],
             eta=scheduled_time
         )
-
+        flash("Reminder added", "success")
         return redirect(url_for("main.reminders"))
     return render_template("add-reminder.html", header="Add Reminder",
                            form=form)
@@ -560,8 +562,11 @@ def resend_email():
                                message="Nothing to resend",
                                success=False)
     success = send_email(pending["email"], pending["subject"], pending["body"])
-    message = ("Email resent! Please check your inbox." if success
-               else "Email failed to send - try again")
+
+    if success:
+        message = "Email resent! Please check your inbox."
+    else:
+        message = "Email failed to send - try again"
 
     return render_template("email-sent.html",
                            header="Resent Email",
@@ -583,8 +588,10 @@ def send_email(email, subject, body, attachments=None):
             msg.attach(*attachment)
     try:
         mail.send(msg)
+        flash("Email sent", "info")
         return True
     except Exception as e:
+        flash("Email failed to send", "error")
         current_app.logger.error(f"MAIL ERROR: {e}")
         return False
 
