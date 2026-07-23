@@ -137,6 +137,53 @@ footer {
     font-weight: 600;
 }
 
+/* #region Loading Screen */
+.loading-screen {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    backdrop-filter: blur(6px);
+    z-index: 999999;
+
+    animation: fadeBlur 1s forwards;
+}
+
+@keyframes fadeBlur {
+    0% {
+        backdrop-filter: blur(0);
+    }
+    100% {
+        backdrop-filter: blur(6px);
+    }
+}
+
+.spinner {
+    border: 8px solid var(--secondary-colour);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border-left-color: var(--primary-colour);
+
+    animation: spinner 1s ease-in-out infinite;
+}
+
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* #endregion */
+
+/* #region Notifications */
+
 /* Styles the notifications, with an animation */ 
 .popup-notification {
     position: fixed;
@@ -194,6 +241,8 @@ footer {
         font-size: 0;
     }
 }
+
+/* #endregion */
 
 /* #endregion */
 
