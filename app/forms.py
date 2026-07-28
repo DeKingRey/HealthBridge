@@ -125,22 +125,22 @@ class ResetPasswordForm(FlaskForm):
 
 
 class AddHealthInfoForm(FlaskForm):
-    name = StringField("Name", validators=[
+    name = StringField("Health Information", validators=[
         InputRequired(),
         Length(min=MIN_HEALTH_LENGTH, max=MAX_HEALTH_LENGTH)],
-        render_kw={"placeholder": "Name"}
+        render_kw={"placeholder": "What do you want to call this info?"}
     )
 
-    default_desc = TextAreaField("Default Description", validators=[
-        InputRequired(),
+    default_desc = TextAreaField("Notes (Optional)", validators=[
+        Optional(),
         Length(min=MIN_DESC_LENGTH, max=MAX_DESC_LENGTH)],
-        render_kw={"placeholder": "Default Description"}
+        render_kw={"placeholder": "Add any extra information"}
     )
 
-    type_id = SelectField("Type", choices=[], coerce=int,
+    type_id = SelectField("Category", choices=[], coerce=int,
                           validators=[InputRequired()])
 
-    submit = SubmitField("Add Info")
+    submit = SubmitField("Add Health Information")
 
     # Ensures type id is not negative or invalid
     def validate_type_id(self, type_id):
@@ -151,20 +151,19 @@ class AddHealthInfoForm(FlaskForm):
 
 
 class AddReminderForm(FlaskForm):
-    name = StringField("Name", validators=[
+    name = StringField("Reminder Name", validators=[
         InputRequired(),
         Length(min=MIN_REMINDER_LENGTH, max=MAX_REMINDER_LENGTH)],
         render_kw={"placeholder": "Name"}
     )
 
-    desc = TextAreaField("Description", validators=[
-        InputRequired(),
+    desc = TextAreaField("Notes (Optional)", validators=[
         Length(min=MIN_DESC_LENGTH, max=MAX_DESC_LENGTH),
         Optional()],
-        render_kw={"placeholder": "Description"}
+        render_kw={"placeholder": "Add any extra information"}
     )
 
-    type_id = SelectField("Type", choices=[], coerce=int,
+    type_id = SelectField("Reminder Type", choices=[], coerce=int,
                           validators=[InputRequired()])
 
     appointment_datetime = DateTimeLocalField(
