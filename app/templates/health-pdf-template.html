@@ -11,6 +11,16 @@
         .section {
             margin-bottom: 20px;
         }
+
+        .logo-image {
+            width: auto;
+            height: 128px;
+            
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
     </style>
 </head>
 <body>
@@ -31,5 +41,7 @@
             {% endif %}
         {% endfor %}
     {% endfor %}
+
+    <img src="static/uploads/healthbridge.png" alt="logo" class="logo-image">
 </body>
 </html>

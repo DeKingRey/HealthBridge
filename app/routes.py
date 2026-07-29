@@ -219,7 +219,7 @@ def generate_health_pdf(user):
     }
 
     html = render_template("health-pdf-template.html", **data)
-    pdf = HTML(string=html).write_pdf()
+    pdf = HTML(string=html, base_url=request.url_root).write_pdf()
 
     return pdf
 

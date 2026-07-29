@@ -13,6 +13,11 @@
     src: url("roboto.ttf");
 }
 
+@font-face {
+    font-family: "nunito";
+    src: url("nunito.ttf");
+}
+
 * {
     font-family: "roboto";
     color: var(--text-colour);
@@ -90,6 +95,16 @@ main {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.header-logo {
+    font-family: "nunito";
+    font-weight: 1000 !important;
+}
+
+.header-logo img {
+    width: auto;
+    height: 40px;
 }
 
 .btns {
