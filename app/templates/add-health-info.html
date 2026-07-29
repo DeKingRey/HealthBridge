@@ -23,6 +23,7 @@
             <!-- Name Div -->
             <div class="form-field">
                 {{ form.name.label }}
+                <label class="sub-label" for="name">This will be the title of your health info</label>
                 {{ form.name }}
 
                 {% for error in form.name.errors %}
@@ -33,6 +34,7 @@
             <!-- Description Div -->
             <div class="form-field">
                 {{ form.default_desc.label }}
+                <label class="sub-label" for="default_desc">Optionally add any additional information related to this health info</label>
                 {{ form.default_desc }}
                 
                 {% for error in form.default_desc.errors %}
@@ -43,6 +45,7 @@
             <!-- Type ID Div -->
             <div class="form-field">
                 {{ form.type_id.label }}
+                <label class="sub-label" for="type_id">What kind of condition is this piece of info?</label>
 
                 <div class="form-wrapper">
                     {{ form.type_id() }}

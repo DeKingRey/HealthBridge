@@ -139,7 +139,7 @@ def add_health_info():
         # Adds new health info
         new_user_health_info = UserHealth(user_id=current_user.id,
                                           health_id=health_info.id,
-                                          description=health_info.default_description)
+                                          description=form.default_desc.data)
         db.session.add(new_user_health_info)
         db.session.commit()
 

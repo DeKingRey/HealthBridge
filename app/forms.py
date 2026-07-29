@@ -128,13 +128,13 @@ class AddHealthInfoForm(FlaskForm):
     name = StringField("Health Information", validators=[
         InputRequired(),
         Length(min=MIN_HEALTH_LENGTH, max=MAX_HEALTH_LENGTH)],
-        render_kw={"placeholder": "What do you want to call this info?"}
+        render_kw={"placeholder": "e.g. Asthma, Gluten Free, Stubborn, Alcoholic, etc"}
     )
 
     default_desc = TextAreaField("Notes (Optional)", validators=[
         Optional(),
         Length(min=MIN_DESC_LENGTH, max=MAX_DESC_LENGTH)],
-        render_kw={"placeholder": "Add any extra information"}
+        render_kw={"placeholder": "e.g. Gluten makes me vomit, Mild asthma, etc"}
     )
 
     type_id = SelectField("Category", choices=[], coerce=int,
@@ -154,13 +154,13 @@ class AddReminderForm(FlaskForm):
     name = StringField("Reminder Name", validators=[
         InputRequired(),
         Length(min=MIN_REMINDER_LENGTH, max=MAX_REMINDER_LENGTH)],
-        render_kw={"placeholder": "Name"}
+        render_kw={"placeholder": "e.g. Melatonin, Annual Checkup, etc"}
     )
 
     desc = TextAreaField("Notes (Optional)", validators=[
         Length(min=MIN_DESC_LENGTH, max=MAX_DESC_LENGTH),
         Optional()],
-        render_kw={"placeholder": "Add any extra information"}
+        render_kw={"placeholder": "e.g. take with food, appointment at 123 Baker St, etc"}
     )
 
     type_id = SelectField("Reminder Type", choices=[], coerce=int,
