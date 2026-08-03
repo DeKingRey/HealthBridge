@@ -481,11 +481,11 @@ def reset_password_request():
                 _external=True
             )
 
-            body = "Reset Password Request"
-            subject = f"Click to reset: {reset_url}"
+            subject = "Reset Password Request"
+            body = f"Click to reset: {reset_url}"
             success = send_email(
                 user.email,
-                body, subject
+                subject, body
             )
 
         if success:
@@ -495,7 +495,7 @@ def reset_password_request():
             message = "Email failed to send - try again"
         # Stores send email info so resend email can access
         session["pending_email"] = {
-            "email": user.data,
+            "email": user.email,
             "subject": subject,
             "body": body
         }
@@ -504,6 +504,7 @@ def reset_password_request():
                                message=message,
                                success=success)
     return render_template("reset-password.html", form=form,
+                           header="Reset Password",
                            email_verified=False)
 
 

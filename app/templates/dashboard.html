@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h1>{{ current_user.first_name }}</h1>
-{% if current_user.is_admin %} <h3>You are an admin</h3> {% endif %}
+<h1 style="text-align: center;">{{ current_user.first_name }}</h1>
+{% if current_user.is_admin %} <h3 style="text-align: center;">You are an admin</h3> {% endif %}
 
 <div class="btns">
     <a href="{{ url_for('main.health_info') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
