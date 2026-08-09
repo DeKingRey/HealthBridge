@@ -73,7 +73,7 @@ main {
     max-width: 1200px;
     width: 100%;
 
-    font-size: 1.6rem;
+    font-size: 2rem;
     line-height: 1.7;
 
     display: flex !important;
@@ -453,7 +453,7 @@ nav {
 @media (max-width: 768px) {
     main {
         padding: 0 1rem;
-        font-size: 1.2rem;
+        font-size: 1.6rem;
     }
 
     .mobile-nav {
@@ -491,6 +491,11 @@ nav {
 
     .modal-actions {
         flex-direction: column;
+    }
+
+    .w3-modal-content {
+        height: fit-content;
+        max-height: fit-content !important;
     }
 }
 
@@ -713,7 +718,7 @@ select {
 .w3-modal-content h3 {
     margin-top: 0;
     margin-bottom: 0.5rem;
-    font-size: 3rem;
+    font-size: 2.3rem;
     font-weight: 700;
 }
 

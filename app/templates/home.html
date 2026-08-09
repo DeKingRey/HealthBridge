@@ -17,6 +17,20 @@
             <a href="/register" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
                 Register
             </a>
+        {% else %}
+            <div class="btns">
+                <a href="{{ url_for('main.health_info') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+                    Health Info
+                </a>
+
+                <a href="{{ url_for('main.reminders') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+                    Reminders
+                </a>
+
+                <a href="{{ url_for('main.logout') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+                    Logout
+                </a>
+            </div>
         {% endif %}
     </div>
 {% endblock %}
