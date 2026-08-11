@@ -29,11 +29,13 @@ from datetime import datetime, timedelta, timezone
 from config import (APPOINTMENT_ID, MEDICATION_ID,
                     UPCOMING_ID, OVERDUE_ID, TAKEN_ID)
 from zoneinfo import ZoneInfo
+from cryptography.fernet import Fernet
 import os
 import math
 
 main = Blueprint("main", __name__)
 serializer = URLSafeTimedSerializer(os.getenv("SECRET_KEY"))
+
 
 
 def generate_verification_token(email):
@@ -102,17 +104,14 @@ def add_health_info():
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
         existing_info = request.form.get("existing_info") == "True"
+        is_public = current_user.is_admin
 
         # Adds input as new info if it doesn't exist
         if not existing_info:
-            is_public = current_user.is_admin
-
             health_info = Health(name=form.name.data,
                                  default_description=form.default_desc.data,
                                  type_id=form.type_id.data,
                                  is_public=is_public)
-            db.session.add(health_info)
-            db.session.commit()
         # Adds existing info if search was used
         else:
             # Checks that existing info id is in database
@@ -135,11 +134,35 @@ def add_health_info():
                                        header="Add Health Info",
                                        form=form,
                                        search_content=search_content)
-            health_info = Health.query.filter_by(id=health_info_id).first()
+            # Gets pre-existing health info
+            public_health = Health.query.filter_by(id=health_info_id).first()
+            health_info = Health(name=public_health.name,
+                                 default_description=public_health.default_description,
+                                 type_id=public_health.type_id,
+                                 is_public=is_public)
+
+        # Encrypts name and description for privacy
+        health_info.name = (
+            form.name.data
+            if is_public
+            else current_app.fernet.encrypt(
+                form.name.data.encode("utf-8")
+            ).decode("utf-8")
+        )
+        health_info.default_description = (
+            form.default_desc.data
+            if is_public
+            else current_app.fernet.encrypt(
+                form.default_desc.data.encode("utf-8")
+            ).decode("utf-8")
+        )
+
+        db.session.add(health_info)
+        db.session.commit()
         # Adds new health info
         new_user_health_info = UserHealth(user_id=current_user.id,
                                           health_id=health_info.id,
-                                          description=form.default_desc.data)
+                                          description=health_info.default_description)
         db.session.add(new_user_health_info)
         db.session.commit()
 
@@ -669,6 +692,17 @@ def get_user_health_entries():
     user_health_entries = db.session.query(UserHealth).join(Health).filter(
         UserHealth.user_id == current_user.id
     ).all()
+
+    # Decrypts all encrypted information for user display
+    for entry in user_health_entries:
+        if not entry.health.is_public:
+            entry.health.name = current_app.fernet.decrypt(
+                entry.health.name.encode("utf-8")
+            ).decode("utf-8")
+
+            entry.health.default_description = current_app.fernet.decrypt(
+                            entry.health.default_description.encode("utf-8")
+                        ).decode("utf-8")
 
     return user_health_entries
 

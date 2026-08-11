@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from config import DATABASE_URL
 import os
 from .extensions import (db, mail, bcrypt, login_manager, migrate)
+from cryptography.fernet import Fernet
 
 load_dotenv()
 
@@ -34,6 +35,9 @@ def create_app():
 
     # Redirects user to login page if they go to login_required page
     login_manager.login_view = "main.login"
+
+    # Sets up fernet for symmetric encryption
+    app.fernet = Fernet(os.getenv("FERNET_KEY"))
 
     # Registers the routes blueprint
     from . routes import main
