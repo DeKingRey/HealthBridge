@@ -29,13 +29,11 @@ from datetime import datetime, timedelta, timezone
 from config import (APPOINTMENT_ID, MEDICATION_ID,
                     UPCOMING_ID, OVERDUE_ID, TAKEN_ID)
 from zoneinfo import ZoneInfo
-from cryptography.fernet import Fernet
 import os
 import math
 
 main = Blueprint("main", __name__)
 serializer = URLSafeTimedSerializer(os.getenv("SECRET_KEY"))
-
 
 
 def generate_verification_token(email):
@@ -206,7 +204,7 @@ def send_health_info():
 
     user_info = User.query.get(current_user.id)
     subject = f"Health Info for {user_info.first_name} {user_info.last_name}"
-    body = f"""Attached is all health information for 
+    body = f"""Attached is all health information for
                {user_info.first_name} {user_info.last_name}."""
     pdf = generate_health_pdf(user_info)
 
@@ -318,9 +316,21 @@ def add_reminder():
             # Converts to UTC for scheduling
             scheduled_time = scheduled_time.astimezone(timezone.utc)
 
+        # Encrypts name and description for privacy
+        name = (
+            current_app.fernet.encrypt(
+                form.name.data.encode("utf-8")
+            ).decode("utf-8")
+        )
+        desc = (
+            current_app.fernet.encrypt(
+                form.desc.data.encode("utf-8")
+            ).decode("utf-8")
+        )
+
         reminder = Reminder(user_id=current_user.id,
-                            name=form.name.data,
-                            description=form.desc.data,
+                            name=name,
+                            description=desc,
                             type_id=form.type_id.data,
                             scheduled_time=scheduled_time,
                             status_id=status_id)
@@ -700,9 +710,9 @@ def get_user_health_entries():
                 entry.health.name.encode("utf-8")
             ).decode("utf-8")
 
-            entry.health.default_description = current_app.fernet.decrypt(
-                            entry.health.default_description.encode("utf-8")
-                        ).decode("utf-8")
+            entry.description = current_app.fernet.decrypt(
+                entry.description.encode("utf-8")
+            ).decode("utf-8")
 
     return user_health_entries
 
@@ -731,6 +741,14 @@ def get_user_reminders():
             # Appointments include dates
             reminder.display_time = display_time.strftime(
                 "%d-%m-%Y %I:%M %p")
+
+        # Decrypts encrypted info for display
+        reminder.name = current_app.fernet.decrypt(
+            reminder.name.encode("utf-8")
+        ).decode("utf-8")
+        reminder.description = current_app.fernet.decrypt(
+            reminder.description.encode("utf-8")
+        ).decode("utf-8")
 
     # Sorts by status OVERDUE->UPCOMING->TAKEN->NONE to order in tracker
     user_reminders.sort(

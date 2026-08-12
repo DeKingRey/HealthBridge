@@ -27,8 +27,8 @@ class HealthType(db.Model):
 
 class Health(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    default_description = db.Column(db.String(500))
+    name = db.Column(db.Text, nullable=False)
+    default_description = db.Column(db.Text)
 
     type_id = db.Column(db.Integer,
                         db.ForeignKey("health_type.id"))
@@ -44,7 +44,7 @@ class UserHealth(db.Model):
                         db.ForeignKey("user.id"), nullable=False)
     health_id = db.Column(db.Integer,
                           db.ForeignKey("health.id"), nullable=False)
-    description = db.Column(db.String(500))
+    description = db.Column(db.Text)
 
     user = db.relationship("User", back_populates="user_links")
     health = db.relationship("Health", back_populates="health_links")
@@ -62,8 +62,8 @@ class Reminder(db.Model):
     user_id = db.Column(db.Integer,
                         db.ForeignKey("user.id"), nullable=False)
 
-    name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(500))
+    name = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text)
 
     type_id = db.Column(db.Integer, db.ForeignKey("reminder_type.id"))
 
