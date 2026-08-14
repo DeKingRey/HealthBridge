@@ -63,9 +63,14 @@
                 {% endfor %}
             </div>
             
-            <label for="remember" style="text-align: left;">
+            <label for="remember" style="text-align: left; margin-bottom: 2rem">
                 Remember Me
                 <input name="remember" type="checkbox" value="True" class="w3-check" style="cursor: pointer;">
+            </label>
+            
+            <label for="privacy-policy" style="text-align: left;" class="sub-label">
+                By creating an account, you agree that Healthbridge will securely store your personal health information so that you can view it and choose to share it with medical professionals.
+                <input name="privacy-policy" type="checkbox" class="w3-check" style="cursor: pointer;" required>
             </label>
 
             <button type="submit" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
