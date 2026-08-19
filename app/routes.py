@@ -101,43 +101,13 @@ def add_health_info():
 
     # Adds info to database if validated succesfully
     if form.validate_on_submit():
-        existing_info = request.form.get("existing_info") == "True"
         is_public = current_user.is_admin
 
-        # Adds input as new info if it doesn't exist
-        if not existing_info:
-            health_info = Health(name=form.name.data,
-                                 default_description=form.default_desc.data,
-                                 type_id=form.type_id.data,
-                                 is_public=is_public)
-        # Adds existing info if search was used
-        else:
-            # Checks that existing info id is in database
-            health_info_id = request.form.get("health_info_id")
-
-            try:
-                health_info_id = int(health_info_id)
-            except (TypeError, ValueError):
-                form.name.errors.append("Invalid ID")
-                return render_template("add-health-info.html",
-                                       header="Add Health Info",
-                                       form=form,
-                                       search_content=search_content)
-            health_info_ids = [h.id for h in health_records]
-
-            # If the id does not exist, it returns an error
-            if health_info_id not in health_info_ids:
-                form.name.errors.append("Invalid ID")
-                return render_template("add-health-info.html",
-                                       header="Add Health Info",
-                                       form=form,
-                                       search_content=search_content)
-            # Gets pre-existing health info
-            public_health = Health.query.filter_by(id=health_info_id).first()
-            health_info = Health(name=public_health.name,
-                                 default_description=public_health.default_description,
-                                 type_id=public_health.type_id,
-                                 is_public=is_public)
+        # Creates health info based off form input
+        health_info = Health(name=form.name.data,
+                             default_description=form.default_desc.data,
+                             type_id=form.type_id.data,
+                             is_public=is_public)
 
         # Encrypts name and description for privacy
         health_info.name = (

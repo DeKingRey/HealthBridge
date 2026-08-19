@@ -26,11 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
             div.addEventListener("click", () => {
                 input.value = match.name;
 
-                console.log(addHealth);
                 if (addHealth)
                 {
                     document.getElementById("health_info_id").value = div.dataset.id;
-                    document.getElementById("existing_info").value = "True";
 
                     // Autofills form content
                     document.getElementById("name").value = match.name;
