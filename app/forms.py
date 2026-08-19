@@ -125,7 +125,7 @@ class ResetPasswordForm(FlaskForm):
 
 
 class AddHealthInfoForm(FlaskForm):
-    name = StringField("Health Information", validators=[
+    name = StringField("Health Information Title", validators=[
         InputRequired(),
         Length(min=MIN_HEALTH_LENGTH, max=MAX_HEALTH_LENGTH)],
         render_kw={"placeholder": "e.g. Asthma, Gluten Free, Stubborn, Alcoholic, etc"}

@@ -400,6 +400,12 @@ nav {
     font-style: italic;
 }
 
+.return-button {
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem auto;
+}
+
 /* #endregion */
 
 /* #region Medicine Tracking Table */
@@ -496,6 +502,10 @@ nav {
     .w3-modal-content {
         height: fit-content;
         max-height: fit-content !important;
+    }
+
+    .return-button {
+        font-size: 1rem;
     }
 }
 

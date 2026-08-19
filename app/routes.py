@@ -493,7 +493,7 @@ def register():
                                header="Please verify your email",
                                message=message,
                                email_failed=True)
-    return render_template("register.html", header="Register",
+    return render_template("register.html", header="Sign Up",
                            form=form)
 
 

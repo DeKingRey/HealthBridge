@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("search_input")
     const suggestions = document.getElementById("suggestions")
+    const max_matches = 5 // Maximum search matches that will be displayed
 
     input.addEventListener("input", () => {
         const query = input.value.trim().toLowerCase(); // Gets the users input and correctly formats
@@ -12,9 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const matches = search_content.filter(content =>
             content.name.toLowerCase().includes(query)
         );  
-
+        
         // Creates suggestions for each match for user to click
-        matches.forEach(match => {
+        matches.slice(0, max_matches).forEach(match => {
             // Creates a div element
             const div = document.createElement("div");
             div.textContent = match.name;

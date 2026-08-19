@@ -10,11 +10,12 @@
             
             <!-- Search input for pre existing health records -->
             <div class="search-container">
-                <label for="search_input">Search for pre-existing health info</label>
+                <label for="search_input">Find existing health information</label>
+                <label class="sub-label" for="search_input">Search our health information library. If you can't find what you're looking for, you can enter it manually.</label>
 
                 <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search..." name="search" id="search_input" autocomplete="off">
+                    <input type="text" placeholder="Search health information..." name="search" id="search_input" autocomplete="off">
                 </div>
 
                 <div id="suggestions"></div>
@@ -62,12 +63,12 @@
                 <input name="privacy-policy" type="checkbox" class="w3-check" style="cursor: pointer;" required>
             </label>
 
-            <button type="submit" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour" style="margin-bottom: 50px;">
+            <button type="submit" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
                 Add Info
             </button>
         </form>
 
-        <a href="{{ url_for('main.health_info') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour">
+        <a href="{{ url_for('main.health_info') }}" class="w3-btn w3-round-xlarge btn-hover-colour accent-colour return-button">
             Return
         </a>
     </div>
